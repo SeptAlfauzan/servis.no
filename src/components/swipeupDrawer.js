@@ -11,8 +11,8 @@ import {
 
 export default function SwipeUpDrawer(props) {
     const height = Dimensions.get('window').height;
-    const initialHeight = height * 3 / 4;
-    const fullHeight = height * 1 / 4;
+    const initialHeight = height + (height * 1 / 4);
+    const fullHeight = height * 3 / 4;
     const y = useSharedValue(initialHeight);
 
     const gestureHandler = useAnimatedGestureHandler({
@@ -48,25 +48,35 @@ export default function SwipeUpDrawer(props) {
     });
 
     return (
-        <GestureHandlerRootView style={tw`flex w-full h-full justify-center items-center absolute`}>
+        <GestureHandlerRootView style={tw`flex w-full justify-center items-center absolute`}>
             {/* component background */}
             {props.children}
             <PanGestureHandler onGestureEvent={gestureHandler}>
-                <Animated.View style={[tw`rounded-t-2xl w-full h-full bg-white absolute flex items-center px-8`, animatedStyle]}>
+                <Animated.View style={[tw`rounded-t-2xl w-full bg-white absolute flex items-center px-8`, animatedStyle, Styles.drawerHeight]}>
                     <View style={tw`w-30 h-1 rounded bg-slate-400 my-3`} />
+                    {/* no data select anim */}
+                    {(props.placeholderText && !props.data) && <Text style={tw`text-xl text-slate-500 text-center mt-5`}>{props.placeholderText}</Text>}
                     {/* detail */}
-                    <View style={tw`flex flex-row justify-between w-full`}>
-                        <View style={tw`w-6/12 h-30 rounded-lg bg-slate-300`}></View>
-                        <View style={tw`w-5/12 h-30 flex justify-between`}>
-                            <Text style={tw`text-xl text-black`}>{props.text}</Text>
-                            <View>
-                                <Text style={tw`text-sm text-slate-500`}>5.0</Text>
-                                <Text style={tw`text-sm text-slate-500`}>5.0</Text>
+                    {props.data &&
+                        <View style={tw`flex flex-row justify-between w-full`}>
+                            <View style={tw`w-6/12 h-30 rounded-lg bg-slate-300`}></View>
+                            <View style={tw`w-5/12 h-30 flex justify-between`}>
+                                <Text style={tw`text-xl text-black`}>{props.data}</Text>
+                                <View>
+                                    <Text style={tw`text-sm text-slate-500`}>5.0</Text>
+                                    <Text style={tw`text-sm text-slate-500`}>5.0</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
+                    }
                 </Animated.View>
             </PanGestureHandler>
         </GestureHandlerRootView>
     );
+}
+
+const Styles = {
+    drawerHeight: {
+        height: '200%',
+    }
 }

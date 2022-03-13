@@ -1,12 +1,14 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import ServicesLocation from './ServicesLocation';
-import SwipeUpDrawer from '../components/swipeupDrawer';
+import LottieView from 'lottie-react-native';
 
 export default function Map() {
     const [location, setLocation] = React.useState(null);
     const [errorMsg, setErrorMsg] = React.useState(null);
+    const loadingAnim = './../../assets/lotties/loading-mapview.json';
+
     React.useEffect(() => {
         (async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -16,14 +18,19 @@ export default function Map() {
                 enableHighAccuracy: true
             });
 
-            setLocation(getLocation);
+            setTimeout(() => {//set additional interval for loading animation
+                setLocation(getLocation);
+            }, 1000);
+
             console.log('location', getLocation);
         })();
     }, []);
 
     return (
         <>
-            {location == null && <Text>get location</Text>}
+            {location == null &&
+                <LottieView source={require(loadingAnim)} autoPlay loop />
+            }
             {location && <ServicesLocation lat={location.coords.latitude} lng={location.coords.longitude} />
             }
         </>

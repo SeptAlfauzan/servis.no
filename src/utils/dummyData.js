@@ -1,23 +1,17 @@
 class DummyData {
-    static getData = async () => {
-        const data =
-            [
-                {
-                    name: "location 1",
-                    coords: {
-                        latitude: -7.9621281,
-                        longitude: 112.6166501,
-                    }
-                },
-                {
-                    name: "location 2",
-                    coords: {
-                        latitude: -7.9621481,
-                        longitude: 112.6166501,
-                    }
-                },
-            ];
-        return JSON.stringify(data);
+    static getData = async (lat, lng) => {
+        const datas = [];
+
+        for (let index = 0; index < 10; index++) {
+            const el = {
+                key: index,
+                latitude: lat + (Math.random() * 0.001),
+                longitude: lng + (Math.random() * 0.001),
+            }
+            datas.push(el);
+        }
+
+        return JSON.stringify(datas);
     }
 }
 

@@ -17,49 +17,53 @@ export default function ServicesLocation({ lat, lng }) {
     const mapStyle = MapStyles.default();
 
     React.useEffect(async () => {
-        const data = await DummyData.getData();
+        const data = await DummyData.getData(lat, lng);
         setPatners(JSON.parse(data));
     }, []);
 
     const handleMakersClick = (arg) => {
         setDetails(arg);
     }
-
+    const handleRegionChange = (region) => {
+        console.log('region', region);
+    }
     return (
-        <SwipeUpDrawer text={details}>
-            <View style={[styles.container, tw`absolute flex min-h-full w-full`]}>
-                <MapView
-                    style={styles.map}
-                    initialRegion={{
+        <View style={[styles.container, tw`absolute flex min-h-full w-full`]}>
+            <MapView
+                style={styles.map}
+                initialRegion={{
+                    latitude: lat,
+                    longitude: lng,
+                    latitudeDelta: LATITUDE_DELTA,
+                    longitudeDelta: LONGITUDE_DELTA,
+                }}
+                customMapStyle={mapStyle}
+                onRegionChangeComplete={handleRegionChange}
+            >
+                {/* current position marker */}
+                <Marker
+                    key={1}
+                    coordinate={{
                         latitude: lat,
                         longitude: lng,
-                        latitudeDelta: LATITUDE_DELTA,
-                        longitudeDelta: LONGITUDE_DELTA,
                     }}
-                    customMapStyle={mapStyle}
+                    onPress={e => handleMakersClick('position 1')}
                 >
+                    {/* on tap on marker */}
+                    <Callout style={styles.plainView}>
+                        <View>
+                            <Text>Your current position</Text>
+                        </View>
+                    </Callout>
+                </Marker>
+                {patners && patners.map(data => (
                     <Marker
-                        key={1}
+                        key={data.key}
                         coordinate={{
-                            latitude: lat,
-                            longitude: lng,
+                            latitude: data.latitude,
+                            longitude: data.longitude,
                         }}
-                        onPress={e => handleMakersClick('position 1')}
-                    >
-                        {/* on tap on marker */}
-                        <Callout style={styles.plainView}>
-                            <View>
-                                <Text>Your current position</Text>
-                            </View>
-                        </Callout>
-                    </Marker>
-                    <Marker
-                        key={2}
-                        coordinate={{
-                            latitude: lat + 0.0005,
-                            longitude: lng + 0.0005,
-                        }}
-                        onPress={e => handleMakersClick('position 2')}
+                        onPress={e => handleMakersClick(`position ${data.key}`)}
                     >
                         {/* on tap on marker */}
                         <Callout style={styles.plainView} onPress={e => console.log('e')}>
@@ -68,9 +72,11 @@ export default function ServicesLocation({ lat, lng }) {
                             </View>
                         </Callout>
                     </Marker>
-                </MapView>
-            </View>
-        </SwipeUpDrawer>
+                )
+                )}
+            </MapView>
+
+        </View>
     );
 }
 
