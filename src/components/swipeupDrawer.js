@@ -10,6 +10,7 @@ import {
 } from 'react-native-gesture-handler';
 
 export default function SwipeUpDrawer(props) {
+    const { data } = props;
     const height = Dimensions.get('window').height;
     const initialHeight = height + (height * 1 / 4);
     const fullHeight = height * 3 / 4;
@@ -55,15 +56,16 @@ export default function SwipeUpDrawer(props) {
                 <Animated.View style={[tw`rounded-t-2xl w-full bg-white absolute flex items-center px-8`, animatedStyle, Styles.drawerHeight]}>
                     <View style={tw`w-30 h-1 rounded bg-slate-400 my-3`} />
                     {/* no data select anim */}
-                    {(props.placeholderText && !props.data) && <Text style={tw`text-xl text-slate-500 text-center mt-5`}>{props.placeholderText}</Text>}
+                    {(props.placeholderText && !data) && <Text style={tw`text-xl text-slate-500 text-center mt-5`}>{props.placeholderText}</Text>}
                     {/* detail */}
-                    {props.data &&
+                    {data &&
                         <View style={tw`flex flex-row justify-between w-full`}>
                             <View style={tw`w-6/12 h-30 rounded-lg bg-slate-300`}></View>
                             <View style={tw`w-5/12 h-30 flex justify-between`}>
-                                <Text style={tw`text-xl text-black`}>{props.data}</Text>
-                                <View>
-                                    <Text style={tw`text-sm text-slate-500`}>5.0</Text>
+                                <Text style={tw`text-xl text-black`}>{data.name}</Text>
+                                <Text style={tw`text-sm text-black`}>{data.address}</Text>
+                                <View >
+                                    <Text style={tw`text-sm text-slate-500`}>{data.star}</Text>
                                     <Text style={tw`text-sm text-slate-500`}>5.0</Text>
                                 </View>
                             </View>

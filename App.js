@@ -8,9 +8,13 @@ import axios, { Axios } from 'axios';
 import LoginForm from './src/components/loginForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginSuccess from './src/screens/loginSuccess';
+// view components
 import ServicesLocation from './src/views/ServicesLocation';
 import Map from './src/views/Map';
-import SwipeUpDrawer from './src/components/swipeupDrawer';
+import Login from './src/views/Login';
+import Test from './src/views/Test';
+import Onboard from './src/views/Onboard';
+import Register from './src/views/Register';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,15 +26,18 @@ export default function App() {
   }, [])
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Home'>
+      <Stack.Navigator initialRouteName='Home' screenOptions={{ headerShown: false }}>
         {authorized ? (
           <Stack.Screen name='LoginSucces' component={LoginSuccess} />
         ) : (
           <>
-            <Stack.Screen name='Home' component={Map} />
+            <Stack.Screen name='Home' component={Onboard} />
             <Stack.Screen name='LoginSucces' component={LoginSuccess} />
           </>
         )}
+        <Stack.Screen name='Login' component={Login} />
+        <Stack.Screen name='Register' component={Register} />
+        <Stack.Screen name='Test' component={Test} />
       </Stack.Navigator>
     </NavigationContainer>
   );

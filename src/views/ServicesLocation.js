@@ -5,9 +5,12 @@ import tw from 'twrnc';
 import MapStyles from '../utils/mapStyle';
 import DummyData from '../utils/dummyData';
 import SwipeUpDrawer from '../components/swipeupDrawer';
+import CustomMarker from '../components/mapMarker';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function ServicesLocation({ lat, lng }) {
     const [patners, setPatners] = React.useState(null);
+    const [unfilterPatners, setUnfilterPatners] = React.useState(null);
     // DELETE THIS
     const [details, setDetails] = React.useState(null);
 
@@ -19,6 +22,7 @@ export default function ServicesLocation({ lat, lng }) {
     React.useEffect(async () => {
         const data = await DummyData.getData(lat, lng);
         setPatners(JSON.parse(data));
+        setUnfilterPatners(patners);
     }, []);
 
     const handleMakersClick = (arg) => {
@@ -27,56 +31,64 @@ export default function ServicesLocation({ lat, lng }) {
     const handleRegionChange = (region) => {
         console.log('region', region);
     }
+    const handleFilter = (arg) => {
+        const filtered = patners.filter(data => {
+            return data.star == 1
+        });
+        setPatners(filtered)
+    }
+    const resetFilter = () => setPatners(unfilterPatners);
     return (
-        <View style={[styles.container, tw`absolute flex min-h-full w-full`]}>
-            <MapView
-                style={styles.map}
-                initialRegion={{
-                    latitude: lat,
-                    longitude: lng,
-                    latitudeDelta: LATITUDE_DELTA,
-                    longitudeDelta: LONGITUDE_DELTA,
-                }}
-                customMapStyle={mapStyle}
-                onRegionChangeComplete={handleRegionChange}
-            >
-                {/* current position marker */}
-                <Marker
-                    key={1}
-                    coordinate={{
+
+        <SwipeUpDrawer placeholderText={'Pilih tempat servis'} data={details}>
+            <View style={[styles.container, tw`flex min-h-full w-full relative`]}>
+                {/* filter component */}
+                <View style={tw`bg-white rounded px-5 mt-5 flex`}>
+                    <TouchableOpacity style={tw`bg-blue-300 text-white px-10`} onPress={() => handleFilter(1)}>
+                        <Text>Testing Filter</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={tw`bg-blue-300 text-white px-10`} onPress={resetFilter}>
+                        <Text>Reset Filter</Text>
+                    </TouchableOpacity>
+                </View>
+                {/* end of filter component */}
+                <MapView
+                    style={styles.map}
+                    initialRegion={{
                         latitude: lat,
                         longitude: lng,
+                        latitudeDelta: LATITUDE_DELTA,
+                        longitudeDelta: LONGITUDE_DELTA,
                     }}
-                    onPress={e => handleMakersClick('position 1')}
+                    customMapStyle={mapStyle}
+                    onRegionChangeComplete={handleRegionChange}
                 >
-                    {/* on tap on marker */}
-                    <Callout style={styles.plainView}>
-                        <View>
-                            <Text>Your current position</Text>
-                        </View>
-                    </Callout>
-                </Marker>
-                {patners && patners.map(data => (
+                    {/* current position marker */}
                     <Marker
-                        key={data.key}
+                        key={1}
                         coordinate={{
-                            latitude: data.latitude,
-                            longitude: data.longitude,
+                            latitude: lat,
+                            longitude: lng,
                         }}
-                        onPress={e => handleMakersClick(`position ${data.key}`)}
+                        onPress={e => console.log('Your current position')}
                     >
                         {/* on tap on marker */}
-                        <Callout style={styles.plainView} onPress={e => console.log('e')}>
+                        <Callout style={styles.plainView}>
                             <View>
-                                <Text>Location one</Text>
+                                <Text>Your current position</Text>
                             </View>
                         </Callout>
                     </Marker>
-                )
-                )}
-            </MapView>
+                    {patners && patners.map((data, index) => (
+                        <View key={index}>
+                            <CustomMarker data={data} placename={data.name} latitude={data.latitude} longitude={data.longitude} handleClick={handleMakersClick} />
+                        </View>
+                    )
+                    )}
+                </MapView>
 
-        </View>
+            </View>
+        </SwipeUpDrawer>
     );
 }
 
