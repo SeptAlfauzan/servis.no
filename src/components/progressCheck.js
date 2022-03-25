@@ -6,7 +6,7 @@ import tw from 'twrnc';
 export default function ProgressCheck(props) {
     const { active, length } = props;
     return (
-        <View style={tw`w-full`}>
+        <View style={tw`w-full mb-2`}>
             <Text style={tw`text-2xl font-bold w-3/4 mx-auto`}>
                 Selesaikan registrasi anda
             </Text>

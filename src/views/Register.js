@@ -24,10 +24,12 @@ export default function Register() {
     }
     const nextStep = () => {
         setCurrentStep(currentStep + 1);
+        Keyboard.dismiss();
         myForm.nextStep();
     }
     const prevStep = () => {
         setCurrentStep(currentStep - 1);
+        Keyboard.dismiss();
         myForm.prevStep();
     }
     return (
@@ -40,9 +42,9 @@ export default function Register() {
                 style={tw`flex pt-8`}
                 keyboardVerticalOffset={5}
             >
-                <ProgressCheck length={3} active={currentStep} />
-                <FieldWrapper step={'step1'}>
+                <ProgressCheck length={4} active={currentStep} />
 
+                <FieldWrapper step={'step1'}>
                     <MultiStepInput name="name" placeholder="Nama" validations={[
                         {
                             rule: isRequired(),
@@ -76,6 +78,7 @@ export default function Register() {
                         ]}
                     />
                 </FieldWrapper>
+
                 <FieldWrapper step={'step2'}>
                     <MultiStepInput name="username" placeholder="Username" validations={[
                         {
@@ -88,6 +91,7 @@ export default function Register() {
                         },
                     ]} />
                 </FieldWrapper>
+
                 <FieldWrapper step={'step3'}>
                     <MultiStepInput
                         name="password"
@@ -110,25 +114,31 @@ export default function Register() {
                         ]}
                     />
                 </FieldWrapper>
+
                 <FormizStep as={View}
                     name="step4" // Split the form with FormizStep
                 >
-                    <TextInput style={{ height: 100 }} placeholder='input kedua' name="test" onChangeText={(e) => console.log(e)} />
+                    <FormPhoneNumber name="phonenumber" submitAction={handleSubmit} />
                 </FormizStep>
 
                 {/* Update the submit button to allow navigation between steps. */}
             </KeyboardAvoidingView>
-            <View style={tw`flex flex-row absolute justify-center bottom-5 w-full px-10`}>
+            <View style={tw`flex flex-row absolute justify-center bottom-2 w-full px-10`}>
                 {!myForm.isFirstStep && (
                     <TouchableOpacity
                         onPress={prevStep}
-                        style={tw`bg-slate-200 px-5 py-2 rounded-full`}
+                        style={tw`bg-slate-200 px-5 py-2 rounded-full ${myForm.isLastStep ? 'hidden' : null}`}
                     >
                         <Text>Kembali</Text>
                     </TouchableOpacity>
                 )}
                 {myForm.isLastStep ? (
-                    <Button disabled={!myForm.isValid} title="submit" onPress={handleSubmit} />
+                    <TouchableOpacity
+                        onPress={handleSubmit}
+                        style={tw`bg-slate-200 px-5 py-2 rounded-full ${myForm.isLastStep ? 'hidden' : null}`}
+                    >
+                        <Text>Submit</Text>
+                    </TouchableOpacity>
                 ) : (
                     <TouchableOpacity disabled={!myForm.isValid} style={tw`px-10 py-2 rounded-full ml-auto ${myForm.isValid ? 'bg-purple-600' : 'bg-slate-300'}`} onPress={nextStep}>
                         <Text style={tw`text-white`}>
@@ -144,10 +154,11 @@ export default function Register() {
 const FieldWrapper = ({ children, step }) => {
     return (
         <FormizStep as={View}
+            style={tw`flex`}
             name={step} // Split the form with FormizStep
         >
             <View style={tw`flex h-3/4 w-full justify-center items-center`}>
-                <View style={tw`flex flex-col w-3/4`}>
+                <View style={tw`flex flex-col w-3/4 bottom-0`}>
                     {children}
                 </View>
             </View>
