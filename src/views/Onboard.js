@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, Image, Dimensions } from 'react
 ;
 import tw from 'twrnc';
 import OnboardData from '../utils/onboardData';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Onboard({ navigation }) {
     const [currindex, setCurrindex] = React.useState(0);
@@ -26,7 +27,6 @@ export default function Onboard({ navigation }) {
     }
     const move = (arg) => {
         try {
-            console.log(data.length)
             const option = arg === 'next' ? 1 : -1;
             flatlistRef.current && flatlistRef.current.scrollToIndex({ index: currindex + option });
             setCurrindex(currindex + option);
@@ -45,7 +45,12 @@ export default function Onboard({ navigation }) {
     }
     const navigateScreen = () => {
         // set to async storage
-        navigation.navigate('Login');
+        try {
+            AsyncStorage.setItem('@nextLaunch', 'true');
+            navigation.navigate('Login');
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (

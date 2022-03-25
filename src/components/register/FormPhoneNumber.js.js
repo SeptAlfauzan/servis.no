@@ -8,10 +8,12 @@ import axios from 'axios';
 export default function FormPhoneNumber() {
     const [phonenum, setPhonenum] = React.useState([]);
     const [phonecode, setPhonecode] = React.useState([]);
+
     React.useEffect(async () => {
         const data = await axios.get('https://gist.githubusercontent.com/anubhavshrimal/75f6183458db8c453306f93521e93d37/raw/f77e7598a8503f1f70528ae1cbf9f66755698a16/CountryCodes.json');
         setPhonecode(data)
     }, [])
+
     const handleNumInput = (arg) => {
         const newNum = [...Array.from(phonenum), arg];
         setPhonenum(newNum);
@@ -24,6 +26,7 @@ export default function FormPhoneNumber() {
     return (
         <>
             <View style={tw`w-3/4 h-1/2 flex-row items-center justify-center`}>
+
                 <TextInput
                     editable={false}
                     style={tw`border border-slate-300 w-3/4 bg-white rounded-tl rounded-bl px-5 py-3 text-black text-xl tracking-wider`}

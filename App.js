@@ -20,9 +20,12 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [authorized, SetAuthorized] = React.useState(false);
+  const [firstLaunch, setFirstLaunch] = React.useState(true);
   const handleLogout = () => SetAuthorized(false);
   React.useEffect(async () => {
     SetAuthorized(Boolean(await AsyncStorage.getItem('@authorized')));
+    const isntFirstLaunch = Boolean(await AsyncStorage.getItem('@nextLaunch'));
+    isntFirstLaunch ? setFirstLaunch(false) : setFirstLaunch(true);
   }, [])
   return (
     <NavigationContainer>
@@ -31,7 +34,7 @@ export default function App() {
           <Stack.Screen name='LoginSucces' component={LoginSuccess} />
         ) : (
           <>
-            <Stack.Screen name='Home' component={Onboard} />
+            <Stack.Screen name='Home' component={firstLaunch ? Onboard : Login} />
             <Stack.Screen name='LoginSucces' component={LoginSuccess} />
           </>
         )}
