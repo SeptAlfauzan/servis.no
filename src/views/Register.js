@@ -3,22 +3,28 @@ import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, 
 import { Formiz, FormizStep, useForm, useField } from '@formiz/core'
 import tw from 'twrnc';
 import FormPhoneNumber from '../components/register/FormPhoneNumber.js';
-import { isEmail, isMinLength, isMaxLength, isRequired } from '@formiz/validations'
+import { isEmail, isMinLength, isMaxLength, isRequired, isPattern } from '@formiz/validations'
 import MultiStepInput from '../components/formizTextInput';
 import { Platform } from 'expo-modules-core';
 import ProgressCheck from '../components/progressCheck.js';
+import PhoneInputComp from '../components/register/PhoneInput.js';
 
 
-const Inputan = (props) => {
+const PhoneInputNum = (props) => {
     const { setValue, value } = useField(props);
     return (
-        <TextInput placeholder='input pertama' onChangeText={e => setValue(e)} value={value ?? ''} style={{ height: 100 }} />)
+        <PhoneInputComp />
+    );
 }
 
 export default function Register() {
     const myForm = useForm()
     const [currentStep, setCurrentStep] = React.useState(1);
+    const [password, setPassword] = React.useState(null);
 
+    React.useEffect(() => {
+        setPassword(myForm.values.password);
+    }, [myForm.values.password])
     const handleSubmit = () => {
         console.log(myForm.values)
     }
@@ -95,6 +101,7 @@ export default function Register() {
                 <FieldWrapper step={'step3'}>
                     <MultiStepInput
                         name="password"
+                        type="password"
                         placeholder="Password"
                         validations={[
                             {
@@ -104,12 +111,17 @@ export default function Register() {
                         ]}
                     />
                     <MultiStepInput
-                        name="password"
-                        placeholder="Password"
+                        name="password2"
+                        type="password"
+                        placeholder="Konfirmasi password"
                         validations={[
                             {
                                 rule: isMinLength(8),
                                 message: 'Password terlalu pendek!'
+                            },
+                            {
+                                rule: isPattern(`^${password}$`),
+                                message: 'Password harus sama'
                             },
                         ]}
                     />
@@ -118,7 +130,8 @@ export default function Register() {
                 <FormizStep as={View}
                     name="step4" // Split the form with FormizStep
                 >
-                    <FormPhoneNumber name="phonenumber" submitAction={handleSubmit} />
+                    {/* <FormPhoneNumber name="phonenumber" submitAction={handl} /> */}
+                    <PhoneInputComp name="phone" />
                 </FormizStep>
 
                 {/* Update the submit button to allow navigation between steps. */}
@@ -127,7 +140,7 @@ export default function Register() {
                 {!myForm.isFirstStep && (
                     <TouchableOpacity
                         onPress={prevStep}
-                        style={tw`bg-slate-200 px-5 py-2 rounded-full ${myForm.isLastStep ? 'hidden' : null}`}
+                        style={tw`bg-slate-200 px-5 py-2 rounded-full`}
                     >
                         <Text>Kembali</Text>
                     </TouchableOpacity>
@@ -135,7 +148,7 @@ export default function Register() {
                 {myForm.isLastStep ? (
                     <TouchableOpacity
                         onPress={handleSubmit}
-                        style={tw`bg-slate-200 px-5 py-2 rounded-full ${myForm.isLastStep ? 'hidden' : null}`}
+                        style={tw`bg-slate-200 px-5 py-2 rounded-full`}
                     >
                         <Text>Submit</Text>
                     </TouchableOpacity>
