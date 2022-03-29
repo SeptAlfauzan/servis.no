@@ -8,6 +8,7 @@ import MultiStepInput from '../components/formizTextInput';
 import { Platform } from 'expo-modules-core';
 import ProgressCheck from '../components/progressCheck.js';
 import PhoneInputComp from '../components/register/PhoneInput.js';
+import Box from './TestAnimation.js';
 
 
 const PhoneInputNum = (props) => {
@@ -130,7 +131,6 @@ export default function Register() {
                 <FormizStep as={View}
                     name="step4" // Split the form with FormizStep
                 >
-                    {/* <FormPhoneNumber name="phonenumber" submitAction={handl} /> */}
                     <PhoneInputComp name="phone" />
                 </FormizStep>
 
