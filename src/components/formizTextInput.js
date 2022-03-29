@@ -30,6 +30,7 @@ export default function MultiStepInput(props) {
                 <TextInput
                     onBlur={() => setTouched(true)}
                     placeholder={props.placeholder}
+                    keyboardType={type ? type : 'default'}
                     style={tw`w-full border px-5 py-2 rounded mb-5 ${!isValid ? ('border-red-500') : ('border-slate-500')}`}
                     onChangeText={e => setValue(e)} value={value ?? ''}
                 />

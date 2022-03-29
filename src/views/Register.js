@@ -8,7 +8,8 @@ import MultiStepInput from '../components/formizTextInput';
 import { Platform } from 'expo-modules-core';
 import ProgressCheck from '../components/progressCheck.js';
 import PhoneInputComp from '../components/register/PhoneInput.js';
-import Box from './TestAnimation.js';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const PhoneInputNum = (props) => {
@@ -26,19 +27,40 @@ export default function Register() {
     React.useEffect(() => {
         setPassword(myForm.values.password);
     }, [myForm.values.password])
-    const handleSubmit = () => {
-        console.log(myForm.values)
+
+    const handleSubmit = async () => {
+        console.log(myForm.values);
+        const { email, username } = myForm.values;
+        // REFACTOR PLEASE
+        try {
+            const getResponse = await axios.get(`http://192.168.1.5:8000/api/users/user/${email}/${username}`)
+            const { verificationCode } = getResponse.data.user;
+            await AsyncStorage.setItem('@verificationCode', toString(verificationCode));
+            await AsyncStorage.setItem('@emailVerication', toString(email));
+        } catch (error) {
+            console.log(error.response.data);
+        }
+        try {
+            const response = await axios.post('http://192.168.1.5:8000/api/register', myForm.values);
+            console.log(response.data.message);
+            // const getResponse = await axios.get('http://192.168.1.11:8000/api/users');
+        } catch (error) {
+            console.log(error.message);
+        }
     }
+
     const nextStep = () => {
         setCurrentStep(currentStep + 1);
         Keyboard.dismiss();
         myForm.nextStep();
     }
+
     const prevStep = () => {
         setCurrentStep(currentStep - 1);
         Keyboard.dismiss();
         myForm.prevStep();
     }
+
     return (
         <Formiz
             connect={myForm}
@@ -87,6 +109,12 @@ export default function Register() {
                 </FieldWrapper>
 
                 <FieldWrapper step={'step2'}>
+                    <MultiStepInput type="email-address" name="email" placeholder="Email" validations={[
+                        {
+                            rule: isEmail(),
+                            message: 'Input bukan merupakan email'
+                        },
+                    ]} />
                     <MultiStepInput name="username" placeholder="Username" validations={[
                         {
                             rule: isMinLength(8),

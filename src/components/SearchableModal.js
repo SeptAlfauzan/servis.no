@@ -56,7 +56,7 @@ const SearchableModal = (props, ref) => {
             <TouchableOpacity onPress={() => props.handlePress && props.handlePress(item)} style={tw`py-2 w-full flex flex-row mb-3 z-10 `}>
                 {props.flags && <Image resizeMode='cover' style={tw`w-7 h-5 mr-5`} source={{ uri: `https://countryflagsapi.com/png/${item.code}` }} />}
                 {/* https://countryflagsapi.com/png/784 */}
-                <Text style={tw`text-md w-full`}>{item.name}</Text>
+                <Text style={tw`w-full`}>{item.name}</Text>
             </TouchableOpacity>
         )
     }
