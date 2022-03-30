@@ -15,6 +15,8 @@ import Login from './src/views/Login';
 import Test from './src/views/Test';
 import Onboard from './src/views/Onboard';
 import Register from './src/views/Register';
+import Verification from './src/views/Verification';
+import SuccessScreen from './src/views/SuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,12 +36,14 @@ export default function App() {
           <Stack.Screen name='LoginSucces' component={LoginSuccess} />
         ) : (
           <>
-            <Stack.Screen name='Home' component={firstLaunch ? Onboard : Login} />
+            <Stack.Screen name='Home' component={firstLaunch ? Onboard : Verification} />
             <Stack.Screen name='LoginSucces' component={LoginSuccess} />
           </>
         )}
         <Stack.Screen name='Login' component={Login} />
         <Stack.Screen name='Register' component={Register} />
+        <Stack.Screen name='SuccessScreen' component={SuccessScreen} />
+        <Stack.Screen name='Verification' component={Verification} />
         <Stack.Screen name='Test' component={Test} />
       </Stack.Navigator>
     </NavigationContainer>

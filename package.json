@@ -40,7 +40,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "react-native-confirmation-code-field": "^7.3.0"
   },
   "private": true
 }
