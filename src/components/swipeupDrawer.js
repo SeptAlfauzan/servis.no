@@ -87,7 +87,7 @@ export default function SwipeUpDrawer(props) {
                                 </View>
                                 <TouchableOpacity style={tw`w-full bg-purple-600 bottom-0 mt-10 px-6 py-5 rounded`}>
                                     <Text>
-                                        Buat Pesanan
+                                        Buat Pesanan baru
                                     </Text>
                                 </TouchableOpacity>
                             </>
