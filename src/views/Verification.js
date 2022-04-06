@@ -45,7 +45,7 @@ const Verification = ({ navigation }) => {
     }, [value])
 
     return (
-        <SafeAreaView style={tw`flex h-full w-full px-10 pt-30`}>
+        <SafeAreaView style={tw`flex h-full w-full px-10 pt-30 top-40`}>
             <Text style={styles.title}>Verification</Text>
             <Text style={tw`text-center text-slate-500 mt-4`}>Silahkan masukkan 6 digit kode verifikasi yang dikirimkan pada email anda.</Text>
             <CodeField

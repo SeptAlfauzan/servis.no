@@ -38,7 +38,7 @@ const PhoneInputComp = (props) => {
     }, [])
 
     return (
-        <View style={tw`flex w-full justify-center items-center mt-30`}>
+        <View style={tw`flex w-full justify-center items-center mt-10`}>
             <Text style={tw`w-3/4 text-slate-600 text-lg mb-3`}>
                 Nomor telepon
             </Text>
@@ -48,7 +48,10 @@ const PhoneInputComp = (props) => {
                 accessibilityLabel='testing'
                 textStyle={{ fontSize: 18, fontWeight: '500' }}
                 ref={phone}
-                onPressFlag={() => modal.current.toggleShow()}
+                onFocus={() => console.log('asdasd')}
+                onPressConfirm={() => console.log('test')}
+                // onPressFlag={() => modal.current.toggleShow()}
+                onPressFlag={null}
                 onChangePhoneNumber={(e) => setValue(phone.current.getValue())}
                 initialCountry={'id'}
                 textProps={{

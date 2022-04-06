@@ -36,7 +36,7 @@ export default function App() {
           <Stack.Screen name='LoginSucces' component={LoginSuccess} />
         ) : (
           <>
-            <Stack.Screen name='Home' component={firstLaunch ? Onboard : Verification} />
+            <Stack.Screen name='Home' component={firstLaunch ? Onboard : Map} />
             <Stack.Screen name='LoginSucces' component={LoginSuccess} />
           </>
         )}
@@ -44,7 +44,7 @@ export default function App() {
         <Stack.Screen name='Register' component={Register} />
         <Stack.Screen name='SuccessScreen' component={SuccessScreen} />
         <Stack.Screen name='Verification' component={Verification} />
-        <Stack.Screen name='Test' component={Test} />
+        <Stack.Screen name='Map' component={Map} />
       </Stack.Navigator>
     </NavigationContainer>
   );

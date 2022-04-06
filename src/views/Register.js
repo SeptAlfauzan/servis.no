@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, BackHandler } from 'react-native';
 import { Formiz, FormizStep, useForm, useField } from '@formiz/core'
 import tw from 'twrnc';
 import FormPhoneNumber from '../components/register/FormPhoneNumber.js';
@@ -19,7 +19,7 @@ const PhoneInputNum = (props) => {
     );
 }
 
-export default function Register() {
+export default function Register({ navigation }) {
     const myForm = useForm()
     const [currentStep, setCurrentStep] = React.useState(1);
     const [password, setPassword] = React.useState(null);
@@ -32,21 +32,24 @@ export default function Register() {
         console.log(myForm.values);
         const { email, username } = myForm.values;
         // REFACTOR PLEASE
-        try {
-            const getResponse = await axios.get(`http://192.168.1.5:8000/api/users/user/${email}/${username}`)
-            const { verificationCode } = getResponse.data.user;
-            await AsyncStorage.setItem('@verificationCode', toString(verificationCode));
-            await AsyncStorage.setItem('@emailVerication', toString(email));
-        } catch (error) {
-            console.log(error.response.data);
-        }
-        try {
-            const response = await axios.post('http://192.168.1.5:8000/api/register', myForm.values);
-            console.log(response.data.message);
-            // const getResponse = await axios.get('http://192.168.1.11:8000/api/users');
-        } catch (error) {
-            console.log(error.message);
-        }
+        // try {
+        //     const getResponse = await axios.get(`http://192.168.1.5:8000/api/users/user/${email}/${username}`)
+        //     const { verificationCode } = getResponse.data.user;
+        //     await AsyncStorage.setItem('@verificationCode', toString(verificationCode));
+        //     await AsyncStorage.setItem('@emailVerication', toString(email));
+        // } catch (error) {
+        //     console.log(error.response.data);
+        // }
+        // try {
+        //     const response = await axios.post('http://192.168.1.5:8000/api/register', myForm.values);
+        //     console.log(response.data.message);
+        //     // const getResponse = await axios.get('http://192.168.1.11:8000/api/users');
+        // } catch (error) {
+        //     console.log(error.message);
+        // }
+        setCurrentStep(1);
+        myForm.reset();
+        navigation.navigate('Verification')
     }
 
     const nextStep = () => {
@@ -56,10 +59,22 @@ export default function Register() {
     }
 
     const prevStep = () => {
+        if (currentStep === 1) navigation.pop();
         setCurrentStep(currentStep - 1);
         Keyboard.dismiss();
         myForm.prevStep();
+        return true;
     }
+    // KURANG CUSTOM BACK BUTTON
+    // React.useEffect(
+    //     () => {
+    //         BackHandler.addEventListener('hardwareBackPress', prevStep)
+    //     }, [currentStep]);
+    // React.useEffect(() => {
+    //     return () => {
+    //         BackHandler.removeEventListener('hardwareBackPress', prevStep);
+    //     }
+    // })
 
     return (
         <Formiz
@@ -68,7 +83,7 @@ export default function Register() {
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-                style={tw`flex pt-8`}
+                style={tw`flex pt-8 top-50`}
                 keyboardVerticalOffset={5}
             >
                 <ProgressCheck length={4} active={currentStep} />
@@ -168,21 +183,21 @@ export default function Register() {
                 {!myForm.isFirstStep && (
                     <TouchableOpacity
                         onPress={prevStep}
-                        style={tw`bg-slate-200 px-5 py-2 rounded-full`}
+                        style={tw`bg-slate-200 px-5 py-2 rounded-full w-1/2`}
                     >
-                        <Text>Kembali</Text>
+                        <Text style={tw`font-bold`}>Kembali</Text>
                     </TouchableOpacity>
                 )}
                 {myForm.isLastStep ? (
                     <TouchableOpacity
                         onPress={handleSubmit}
-                        style={tw`bg-slate-200 px-5 py-2 rounded-full`}
+                        style={tw`px-5 py-2 rounded-full w-1/2 ${myForm.isValid ? 'bg-purple-600 w-1/2' : 'bg-slate-300'}`}
                     >
-                        <Text>Submit</Text>
+                        <Text style={tw`font-bold text-white text-center`}>Register</Text>
                     </TouchableOpacity>
                 ) : (
-                    <TouchableOpacity disabled={!myForm.isValid} style={tw`px-10 py-2 rounded-full ml-auto ${myForm.isValid ? 'bg-purple-600' : 'bg-slate-300'}`} onPress={nextStep}>
-                        <Text style={tw`text-white`}>
+                    <TouchableOpacity disabled={!myForm.isValid} style={tw`px-10 py-2 rounded-full ml-auto ${myForm.isValid ? 'bg-purple-600 w-1/2' : 'bg-slate-300'}`} onPress={nextStep}>
+                        <Text style={tw`text-white font-bold`}>
                             Selanjutnya
                         </Text>
                     </TouchableOpacity>
