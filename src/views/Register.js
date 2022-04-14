@@ -1,8 +1,7 @@
 import React from 'react';
-import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, BackHandler } from 'react-native';
+import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, BackHandler, Dimensions } from 'react-native';
 import { Formiz, FormizStep, useForm, useField } from '@formiz/core'
 import tw from 'twrnc';
-import FormPhoneNumber from '../components/register/FormPhoneNumber.js';
 import { isEmail, isMinLength, isMaxLength, isRequired, isPattern } from '@formiz/validations'
 import MultiStepInput from '../components/formizTextInput';
 import { Platform } from 'expo-modules-core';
@@ -10,7 +9,7 @@ import ProgressCheck from '../components/progressCheck.js';
 import PhoneInputComp from '../components/register/PhoneInput.js';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { API_URL, API_REGISTER } from 'react-native-dotenv';
 
 const PhoneInputNum = (props) => {
     const { setValue, value } = useField(props);
@@ -19,11 +18,18 @@ const PhoneInputNum = (props) => {
     );
 }
 
+const getTopSpacing = (arg) => Dimensions.get('screen').height * arg;
+
 export default function Register({ navigation }) {
     const myForm = useForm()
     const [currentStep, setCurrentStep] = React.useState(1);
     const [password, setPassword] = React.useState(null);
+    const [topSpacing, setTopSpacing] = React.useState(0);
 
+    React.useEffect(() => {
+        setTopSpacing(getTopSpacing(0.1));
+        console.log(API_URL);
+    }, [])
     React.useEffect(() => {
         setPassword(myForm.values.password);
     }, [myForm.values.password])
@@ -32,21 +38,22 @@ export default function Register({ navigation }) {
         console.log(myForm.values);
         const { email, username } = myForm.values;
         // REFACTOR PLEASE
-        // try {
-        //     const getResponse = await axios.get(`http://192.168.1.5:8000/api/users/user/${email}/${username}`)
-        //     const { verificationCode } = getResponse.data.user;
-        //     await AsyncStorage.setItem('@verificationCode', toString(verificationCode));
-        //     await AsyncStorage.setItem('@emailVerication', toString(email));
-        // } catch (error) {
-        //     console.log(error.response.data);
-        // }
-        // try {
-        //     const response = await axios.post('http://192.168.1.5:8000/api/register', myForm.values);
-        //     console.log(response.data.message);
-        //     // const getResponse = await axios.get('http://192.168.1.11:8000/api/users');
-        // } catch (error) {
-        //     console.log(error.message);
-        // }
+        try {
+            // const register = await axios.post('http://192.168.1.5:8000/api/register', myForm.values);
+            // console.log('register', register);
+            // get user data for verification
+            const getUser = await axios.get(`${API_URL
+                }api/users/user/${email}/${username}`)
+            const { verificationCode } = getUser.data.user;
+            console.log(toString(verificationCode));
+            await AsyncStorage.setItem('@verificationCode', `${verificationCode}`);
+            await AsyncStorage.setItem('@emailVerication', `${email}`);
+            await AsyncStorage.setItem('@username', `${username}`);
+            ;
+        } catch (error) {
+            console.log(error.response.data);
+        }
+
         setCurrentStep(1);
         myForm.reset();
         navigation.navigate('Verification')
@@ -83,7 +90,7 @@ export default function Register({ navigation }) {
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-                style={tw`flex pt-8 top-50`}
+                style={[tw`flex pt-8`, { top: topSpacing }]}
                 keyboardVerticalOffset={5}
             >
                 <ProgressCheck length={4} active={currentStep} />
@@ -132,7 +139,7 @@ export default function Register({ navigation }) {
                     ]} />
                     <MultiStepInput name="username" placeholder="Username" validations={[
                         {
-                            rule: isMinLength(8),
+                            rule: isMinLength(5),
                             message: 'Nama terlalu pendek!'
                         },
                         {

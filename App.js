@@ -17,6 +17,9 @@ import Onboard from './src/views/Onboard';
 import Register from './src/views/Register';
 import Verification from './src/views/Verification';
 import SuccessScreen from './src/views/SuccessScreen';
+import PushNotif from './src/views/PushNotif';
+import AccountProfile from './src/views/AccountProfile';
+import EditAccount from './src/views/EditAccount';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +39,7 @@ export default function App() {
           <Stack.Screen name='LoginSucces' component={LoginSuccess} />
         ) : (
           <>
-            <Stack.Screen name='Home' component={firstLaunch ? Onboard : Map} />
+            <Stack.Screen name='Home' component={firstLaunch ? Onboard : AccountProfile} />
             <Stack.Screen name='LoginSucces' component={LoginSuccess} />
           </>
         )}
@@ -45,6 +48,9 @@ export default function App() {
         <Stack.Screen name='SuccessScreen' component={SuccessScreen} />
         <Stack.Screen name='Verification' component={Verification} />
         <Stack.Screen name='Map' component={Map} />
+        <Stack.Screen name='PushNotif' component={PushNotif} />
+        <Stack.Screen name='AccountProfile' component={AccountProfile} />
+        <Stack.Screen name='EditAccount' component={EditAccount} />
       </Stack.Navigator>
     </NavigationContainer>
   );

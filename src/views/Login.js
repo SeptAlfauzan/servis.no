@@ -18,7 +18,7 @@ export default function Login({ navigation }) {
                         <Entypo name={peek ? 'eye-with-line' : 'eye'} size={20} color="black" style={tw`py-3`} />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('PushNotif')}>
                     <Text style={tw`text-purple-500 text-right py-3 font-bold`}>Lupa password</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={tw`bg-slate-500 mt-5 rounded w-full`}>
