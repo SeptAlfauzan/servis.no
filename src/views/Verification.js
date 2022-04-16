@@ -74,6 +74,7 @@ const Verification = ({ navigation }) => {
     }
 
     const sendVerification = async () => {
+        console.log(username)
         try {
             const res = await axios.put(`${API_URL}api/users/user/verify/${username}`, {
                 email,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, BackHandler, Dimensions } from 'react-native';
+import { Button, View, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, BackHandler, Dimensions, Alert } from 'react-native';
 import { Formiz, FormizStep, useForm, useField } from '@formiz/core'
 import tw from 'twrnc';
 import { isEmail, isMinLength, isMaxLength, isRequired, isPattern } from '@formiz/validations'
@@ -35,28 +35,38 @@ export default function Register({ navigation }) {
     }, [myForm.values.password])
 
     const handleSubmit = async () => {
-        console.log(myForm.values);
-        const { email, username } = myForm.values;
+        const { name, username, password, address, email, phone } = myForm.values;
+        const data = {
+            name,
+            username,
+            password,
+            address,
+            email,
+            phone,
+        }
+        console.log(data);
         // REFACTOR PLEASE
         try {
-            // const register = await axios.post('http://192.168.1.5:8000/api/register', myForm.values);
-            // console.log('register', register);
+            const register = await axios.post(`${API_URL}api/register`, data);
+            console.log('register', register);
             // get user data for verification
-            const getUser = await axios.get(`${API_URL
-                }api/users/user/${email}/${username}`)
-            const { verificationCode } = getUser.data.user;
-            console.log(toString(verificationCode));
-            await AsyncStorage.setItem('@verificationCode', `${verificationCode}`);
-            await AsyncStorage.setItem('@emailVerication', `${email}`);
-            await AsyncStorage.setItem('@username', `${username}`);
-            ;
+            if (register) {
+                const getUser = await axios.get(`${API_URL
+                    }api/users/user/${email}/${username}`)
+                const { verificationCode } = getUser.data.user;
+
+                await AsyncStorage.setItem('@verificationCode', `${verificationCode}`);
+                await AsyncStorage.setItem('@emailVerication', `${email}`);
+                await AsyncStorage.setItem('@username', `${username}`);
+                setCurrentStep(1);
+                myForm.reset();
+                navigation.navigate('Verification')
+            }
         } catch (error) {
-            console.log(error.response.data);
+            console.log(error.response.data.message);
+            Alert(error.response.data.message);
         }
 
-        setCurrentStep(1);
-        myForm.reset();
-        navigation.navigate('Verification')
     }
 
     const nextStep = () => {

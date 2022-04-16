@@ -1,15 +1,65 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import tw from 'twrnc';
 import { MaterialIcons } from '@expo/vector-icons';
 import ModalPopup from './../components/ModalPopup';
 import HeaderNav from '../components/HeaderNav';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { API_URL } from 'react-native-dotenv';
 
-
-const PressableMenu = () => { }
+const PressableMenu = ({ children, handleOnPress }) => {
+    return (
+        <TouchableOpacity
+            style={tw`rounded-lg overflow-hidden flex-row justify-between my-1`}
+            onPress={handleOnPress}
+        >
+            <View style={tw`flex-row`}>
+                {children}
+            </View>
+            <MaterialIcons name="keyboard-arrow-right" style={tw`self-center`} size={18} color="black" />
+        </TouchableOpacity>
+    );
+}
 
 export default function AccountProfile({ navigation }) {
+    const [name, setName] = React.useState(null);
+    const [username, setUsername] = React.useState(null);
+    const [user, setUser] = React.useState({});
+
     const modalPopup = React.useRef(null);
+
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.removeItem('@authorized');
+            await AsyncStorage.removeItem('@access-token');
+
+            navigation.navigate('Login');
+        } catch (error) {
+            Alert(error);
+        }
+    };
+
+    React.useEffect(async () => {
+        try {
+            const getusername = await AsyncStorage.getItem('@username');
+            setUsername(getusername);
+
+            const token = await AsyncStorage.getItem('@access-token');
+            const { data } = await axios.get(`${API_URL}api/users/user/${getusername}`,
+                {
+                    headers: {
+                        'authorization': token
+                    }
+                }
+            );
+            console.log('data', data)
+            setUser(data.user);
+            setName(data.user.name);
+        } catch (error) {
+            console.log(error);
+        }
+    }, [])
 
     return (
         <View style={tw`flex-col h-full w-full bg-slate-50 pt-10 px-3 items-center`}>
@@ -27,7 +77,7 @@ export default function AccountProfile({ navigation }) {
                             Batal
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={tw`min-w-24 bg-red-400 rounded-lg px-3 py-2 ml-auto`}>
+                    <TouchableOpacity style={tw`min-w-24 bg-red-400 rounded-lg px-3 py-2 ml-auto`} onPress={handleLogout}>
                         <Text style={tw`text-center text-white font-bold`}>
                             Iya, Logout
                         </Text>
@@ -40,54 +90,44 @@ export default function AccountProfile({ navigation }) {
                     <Image
                         style={tw`w-20 h-20 rounded-full border`}
                         source={{
-                            uri: 'https://ui-avatars.com/api/?name=Septa+alfauzan&background=7868E6&color=fff',
+                            uri: `https://ui-avatars.com/api/?name=${name}&background=7868E6&color=fff`,
                         }}
                     />
                 </View>
-                <Text style={tw`text-slate-600 font-bold text-lg`}>Septa Alfauzan</Text>
-                <Text style={tw`text-slate-400`}>septa</Text>
+                <Text style={tw`text-slate-600 font-bold text-lg`}>{name}</Text>
+                <Text style={tw`text-slate-400`}>{username}</Text>
             </View>
 
             <View style={tw` w-full rounded-xl bg-white px-5 py-10`}>
-                <TouchableOpacity
-                    style={tw`rounded-lg overflow-hidden flex-row justify-between my-1`}
-                    onPress={() => navigation.navigate('EditAccount')}
-                >
-                    <View style={tw`flex-row`}>
-                        <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
-                            <MaterialIcons name="edit" size={18} color="black" />
-                        </View>
-                        <Text style={tw`text-slate-600 self-center ml-5`}>Edit profil</Text>
+
+                <PressableMenu handleOnPress={() => navigation.navigate('EditAccount', { user })}>
+                    <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
+                        <MaterialIcons name="edit" size={18} color="black" />
                     </View>
-                    <MaterialIcons name="keyboard-arrow-right" style={tw`self-center`} size={18} color="black" />
-                </TouchableOpacity>
-                <TouchableOpacity style={tw`rounded-lg overflow-hidden flex-row justify-between my-1`}>
-                    <View style={tw`flex-row`}>
-                        <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
-                            <MaterialIcons name="history" size={18} color="black" />
-                        </View>
-                        <Text style={tw`text-slate-600 self-center ml-5`}>History pesanan</Text>
+                    <Text style={tw`text-slate-600 self-center ml-5`}>Edit profil</Text>
+                </PressableMenu>
+
+                <PressableMenu handleOnPress={null}>
+                    <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
+                        <MaterialIcons name="history" size={18} color="black" />
                     </View>
-                    <MaterialIcons name="keyboard-arrow-right" style={tw`self-center`} size={18} color="black" />
-                </TouchableOpacity>
-                <TouchableOpacity style={tw`rounded-lg overflow-hidden flex-row justify-between my-1`}>
-                    <View style={tw`flex-row`}>
-                        <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
-                            <MaterialIcons name="home-repair-service" size={18} color="black" />
-                        </View>
-                        <Text style={tw`text-slate-600 self-center ml-5`}>Daftar sebagai mitra</Text>
+                    <Text style={tw`text-slate-600 self-center ml-5`}>History pesanan</Text>
+                </PressableMenu>
+
+                <PressableMenu handleOnPress={null}>
+                    <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
+                        <MaterialIcons name="home-repair-service" size={18} color="black" />
                     </View>
-                    <MaterialIcons name="keyboard-arrow-right" style={tw`self-center`} size={18} color="black" />
-                </TouchableOpacity>
-                <TouchableOpacity style={tw`rounded-lg overflow-hidden flex-row justify-between my-1`} onPress={() => modalPopup.current.toggleShow()}>
-                    <View style={tw`flex-row`}>
-                        <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
-                            <MaterialIcons name="logout" size={18} color="black" />
-                        </View>
-                        <Text style={tw`text-slate-600 self-center ml-5`}>Logout</Text>
+                    <Text style={tw`text-slate-600 self-center ml-5`}>Daftar sebagai mitra</Text>
+                </PressableMenu>
+
+                <PressableMenu handleOnPress={() => modalPopup.current.toggleShow()}>
+                    <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
+                        <MaterialIcons name="logout" size={18} color="black" />
                     </View>
-                    <MaterialIcons name="keyboard-arrow-right" style={tw`self-center`} size={18} color="black" />
-                </TouchableOpacity>
+                    <Text style={tw`text-slate-600 self-center ml-5`}>Logout</Text>
+                </PressableMenu>
+
             </View>
         </View>
     );

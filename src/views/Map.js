@@ -13,10 +13,12 @@ export default function Map() {
         (async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
             status !== 'granted' && setErrorMsg('Location permission is denied!');
-
             const getLocation = await Location.getCurrentPositionAsync({
                 enableHighAccuracy: true
             });
+            console.log(await Location.getCurrentPositionAsync({
+                enableHighAccuracy: true
+            }))
 
             setTimeout(() => {//set additional interval for loading animation
                 setLocation(getLocation);

@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import PhoneInput from 'react-native-phone-input';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function EditAccount({ navigation, route }) {
+export default function RegisterPatner({ navigation, route }) {
 
     const { user } = route.params;
 
