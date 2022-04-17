@@ -6,18 +6,37 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import PhoneInput from 'react-native-phone-input';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function EditAccount({ navigation, route }) {
 
+    const [image, setImage] = React.useState(null);
     const { user } = route.params;
 
     React.useEffect(() => {
         console.log(user);
     }, [])
 
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        console.log(result);
+
+        if (!result.cancelled) {
+            setImage(result.uri);
+        }
+    };
+
     return (
         <View style={tw`flex min-h-full bg-slate-50`}>
-            <HeaderNav title="Edit Akun" navigation={navigation} />
+            <HeaderNav title="Gabung Mitra" navigation={navigation} />
             <Formik
                 initialValues={{
                     name: user.name,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import tw from 'twrnc';
 import { MaterialIcons } from '@expo/vector-icons';
 import ModalPopup from './../components/ModalPopup';
@@ -26,6 +26,7 @@ export default function AccountProfile({ navigation }) {
     const [name, setName] = React.useState(null);
     const [username, setUsername] = React.useState(null);
     const [user, setUser] = React.useState({});
+    const [loading, setLoading] = React.useState(true);
 
     const modalPopup = React.useRef(null);
 
@@ -52,7 +53,11 @@ export default function AccountProfile({ navigation }) {
                         'authorization': token
                     }
                 }
-            );
+            ).then(data => {
+                setLoading(false);
+                return data;
+            });
+
             console.log('data', data)
             setUser(data.user);
             setName(data.user.name);
@@ -87,12 +92,16 @@ export default function AccountProfile({ navigation }) {
             {/* navigation */}
             <View style={tw`mt-30 mb-20 flex items-center`}>
                 <View style={tw`border border-purple-300 rounded-full p-1`}>
-                    <Image
-                        style={tw`w-20 h-20 rounded-full border`}
-                        source={{
-                            uri: `https://ui-avatars.com/api/?name=${name}&background=7868E6&color=fff`,
-                        }}
-                    />
+                    {loading ? (
+                        <ActivityIndicator size="large" color="#000012" />
+                    ) : (
+                        <Image
+                            style={tw`w-20 h-20 rounded-full border`}
+                            source={{
+                                uri: `https://ui-avatars.com/api/?name=${name}&background=7868E6&color=fff`,
+                            }}
+                        />
+                    )}
                 </View>
                 <Text style={tw`text-slate-600 font-bold text-lg`}>{name}</Text>
                 <Text style={tw`text-slate-400`}>{username}</Text>
@@ -114,7 +123,7 @@ export default function AccountProfile({ navigation }) {
                     <Text style={tw`text-slate-600 self-center ml-5`}>History pesanan</Text>
                 </PressableMenu>
 
-                <PressableMenu handleOnPress={null}>
+                <PressableMenu handleOnPress={() => navigation.navigate('RegisterPatner')}>
                     <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
                         <MaterialIcons name="home-repair-service" size={18} color="black" />
                     </View>

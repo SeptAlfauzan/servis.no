@@ -1,14 +1,16 @@
 import * as React from 'react';
 import MapView, { Callout, Marker } from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import tw from 'twrnc';
 import MapStyles from '../utils/mapStyle';
 import DummyData from '../utils/dummyData';
 import SwipeUpDrawer from '../components/swipeupDrawer';
 import CustomMarker from '../components/mapMarker';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { MaterialIcons } from '@expo/vector-icons';
 
-export default function ServicesLocation({ lat, lng }) {
+const height = Dimensions.get('screen').height;
+
+export default function ServicesLocation({ lat, lng, navigation }) {
     const [patners, setPatners] = React.useState(null);
     const [unfilterPatners, setUnfilterPatners] = React.useState(null);
     // DELETE THIS
@@ -41,16 +43,14 @@ export default function ServicesLocation({ lat, lng }) {
     return (
 
         <SwipeUpDrawer placeholderText={'Pilih tempat servis'} data={details}>
+
             <View style={[styles.container, tw`flex min-h-full w-full relative`]}>
                 {/* filter component */}
-                <View style={tw`bg-white rounded px-5 mt-5 flex`}>
-                    <TouchableOpacity style={tw`bg-blue-300 text-white px-10`} onPress={() => handleFilter(1)}>
-                        <Text>Testing Filter</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={tw`bg-blue-300 text-white px-10`} onPress={resetFilter}>
-                        <Text>Reset Filter</Text>
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity style={tw`bg-white pl-2 rounded-full absolute top-10 left-10 z-10 w-10 h-10 flex items-center justify-center`}
+                    onPress={() => navigation.pop()}
+                >
+                    <MaterialIcons name="arrow-back-ios" size={24} color="black" />
+                </TouchableOpacity>
                 {/* end of filter component */}
                 <MapView
                     style={styles.map}

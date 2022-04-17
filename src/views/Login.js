@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, TextInput, Keyboard } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Keyboard, ActivityIndicator } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import tw from 'twrnc';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,14 +11,19 @@ import * as Yup from 'yup';
 export default function Login({ navigation }) {
     const [peek, setPeek] = React.useState(false);
     const [errorLogin, setErrorLogin] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
     const formik = React.useRef(null);
     const handlePeekPassword = () => setPeek(!peek);
 
     const handleLogin = async (data) => {
+        setLoading(true);
         setErrorLogin(null);
         try {
             console.log(API_URL)
-            const response = await axios.post(`${API_URL}api/auth`, data);
+            const response = await axios.post(`${API_URL}api/auth`, data).then(data => {
+                setLoading(false);
+                return data;
+            });
             console.log(response)
             await AsyncStorage.setItem('@authorized', response.data.message);
 
@@ -105,7 +110,11 @@ export default function Login({ navigation }) {
                                 <Text style={tw`text-purple-500 text-right py-3 font-bold`}>Lupa password</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={tw`bg-slate-500 mt-5 rounded w-full`} onPress={handleSubmit}>
-                                <Text style={tw`text-white text-lg text-center py-3`}>Login</Text>
+                                {loading ? (
+                                    <ActivityIndicator size="large" color="#ffffff" />
+                                ) : (
+                                    <Text style={tw`text-white text-lg text-center py-3`}>Login</Text>
+                                )}
                             </TouchableOpacity>
                         </>
                     )}

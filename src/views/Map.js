@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import ServicesLocation from './ServicesLocation';
 import LottieView from 'lottie-react-native';
 
-export default function Map() {
+export default function Map({ navigation }) {
     const [location, setLocation] = React.useState(null);
     const [errorMsg, setErrorMsg] = React.useState(null);
     const loadingAnim = './../../assets/lotties/loading-mapview.json';
@@ -22,7 +22,7 @@ export default function Map() {
 
             setTimeout(() => {//set additional interval for loading animation
                 setLocation(getLocation);
-            }, 1000);
+            }, 500);
 
             console.log('location', getLocation);
         })();
@@ -33,7 +33,7 @@ export default function Map() {
             {location == null &&
                 <LottieView source={require(loadingAnim)} autoPlay loop />
             }
-            {location && <ServicesLocation lat={location.coords.latitude} lng={location.coords.longitude} />
+            {location && <ServicesLocation lat={location.coords.latitude} lng={location.coords.longitude} navigation={navigation} />
             }
         </>
     );

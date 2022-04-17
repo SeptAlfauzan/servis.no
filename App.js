@@ -20,6 +20,8 @@ import SuccessScreen from './src/views/SuccessScreen';
 import PushNotif from './src/views/PushNotif';
 import AccountProfile from './src/views/AccountProfile';
 import EditAccount from './src/views/EditAccount';
+import RegisterPatner from './src/views/RegisterPatner';
+import SelectLocation from './src/views/SelectLocation';
 
 const Stack = createNativeStackNavigator();
 
@@ -56,6 +58,8 @@ export default function App() {
         <Stack.Screen name='PushNotif' component={PushNotif} />
         <Stack.Screen name='AccountProfile' component={AccountProfile} />
         <Stack.Screen name='EditAccount' component={EditAccount} />
+        <Stack.Screen name='RegisterPatner' component={RegisterPatner} />
+        <Stack.Screen name='SelectLocation' component={SelectLocation} />
       </Stack.Navigator>
     </NavigationContainer>
   );
