@@ -80,7 +80,10 @@ const Verification = ({ navigation }) => {
                 email,
                 verificationCode: verifCode,
             });
-            res.status == 200 ? navigation.navigate('SuccessScreen') : null;
+            res.status == 200 ? navigation.navigate('SuccessScreen', {
+                text: 'verifikasi akun anda berhasil',
+                view: 'Login'
+            }) : null;
         } catch (error) {
             console.log('error', error);
         }

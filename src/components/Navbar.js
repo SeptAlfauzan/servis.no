@@ -5,8 +5,8 @@ import tw from 'twrnc';
 import { Settings } from 'react-native-web';
 
 export default function Navbar({ state, descriptors, navigation }) {
-    console.log(state)
-    const [routename, setRoutename] = React.useState(null);
+    const [routename,
+        setRoutename] = React.useState(null);
 
     React.useEffect(() => {
         const currentIndex = state.index;
@@ -33,7 +33,7 @@ export default function Navbar({ state, descriptors, navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
                 style={tw`flex justify-center items-center w-20 py-1 rounded-full`}
-                onPress={null}
+                onPress={() => navigation.navigate('ScanQR')}
             >
                 <MaterialIcons name="qr-code" size={24} style={tw`${routename == 'Scan' ? 'text-white' : 'text-black'}`} />
                 <Text style={tw`text-xs`}>Scan</Text>

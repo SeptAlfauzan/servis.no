@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, Text, TouchableOpacity, Image, Button, ScrollView } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, Image, Button, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import tw from 'twrnc';
 import HeaderNav from '../components/HeaderNav';
 import { Formik } from 'formik';
@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const options = {
@@ -27,7 +28,19 @@ const options = {
 export default function RegisterPatner({ navigation, route }) {
 
     const [image, setImage] = React.useState(null);
+    const [location, setLocation] = React.useState(null);
     const [imageData, setImageData] = React.useState(null);
+    const [loading, setLoading] = React.useState(false)
+
+    React.useEffect(() => {
+        try {
+            const { locationDetail } = route.params;
+            console.log('location.address', locationDetail)
+            setLocation(locationDetail);
+        } catch (error) {
+            console.log(error.message)
+        }
+    }, [route.params])
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
@@ -38,7 +51,6 @@ export default function RegisterPatner({ navigation, route }) {
             setImageData(result);
         }
     };
-
 
     const openGallery = async () => {
         const result = await launchImageLibrary(options);
@@ -62,30 +74,39 @@ export default function RegisterPatner({ navigation, route }) {
     };
 
     const handleFormSubmit = async (data) => {
-        const { name, email, address, password, phone } = data;
+        const { name, email, address, password, phone, lat, lng } = data;
+        setLoading(true);
         const formData = new FormData();
-        formData.append('name', name);
-        formData.append('email', email);
-        formData.append('address', address);
-        // formData.append('password', password);
-        formData.append('phone', phone);
-        formData.append('photo',
-            {
-                name: imageData.fileName || imageData.uri.substr(imageData.uri.lastIndexOf('/') + 1),
-                uri: image,
-                type: 'image/jpeg'
-            });
-        console.log(formData);
-        // const config = {
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data; boundary=6ff46e0b6b5148d984f148b6542e5a5d',
-        //     },
-        // };
         try {
-            await fetch('http://a626-103-141-108-25.ngrok.io/api/patners', {
+            formData.append('name', name);
+            formData.append('username', await AsyncStorage.getItem('@username'));
+            formData.append('address', address);
+            formData.append('lat', lat);
+            formData.append('lng', lng);
+            formData.append('password', '-');
+            formData.append('phone', phone);
+            formData.append('photo',
+                {
+                    name: imageData.fileName || imageData.uri.substr(imageData.uri.lastIndexOf('/') + 1),
+                    uri: image,
+                    type: 'image/jpeg'
+                });
+            console.log(formData);
+            // const config = {
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data; boundary=6ff46e0b6b5148d984f148b6542e5a5d',
+            //     },
+            // };
+            fetch('https://c087-103-141-108-25.ngrok.io/api/patners', {
                 method: "POST",
                 body: formData
-            });
+            }).then(response => {
+                setLoading(false);
+                navigation.navigate('SuccessScreen', {
+                    text: 'Anda terdaftar sebagai mitra',
+                    view: 'Dashboard'
+                })
+            }).catch(error => Alert(error.message));
             console.log('berhasil')
         } catch (error) {
             console.log(error);
@@ -95,8 +116,9 @@ export default function RegisterPatner({ navigation, route }) {
 
     return (
         <View style={tw`flex min-h-full bg-slate-50`}>
-            <HeaderNav title="Gabung Mitra" navigation={navigation} />
+            <HeaderNav title="Gabung Mitra" navigation={navigation} backto="AccountProfile" />
             <Formik
+                enableReinitialize
                 initialValues={{
                     name: '-',
                     username: 'asd-',
@@ -104,11 +126,15 @@ export default function RegisterPatner({ navigation, route }) {
                     photo: '-',
                     password: '12345678',
                     phone: '0',
-                    address: '0',
-                    latlang: '',
+                    address: location ? location.address : '',
+                    lat: location ? location.location.lat : '',
+                    lng: location ? location.location.lng : '',
                 }}
                 validationSchema={EditSchema}
                 onSubmit={values => {
+                    // values.address = location ? location.address : values.address;
+                    // values.lat = location ? location.location.lat : values.lat;
+                    // values.lng = location ? location.location.lng : values.lng;
                     // same shape as initial values
                     console.log('onsubmit', values)
                     handleFormSubmit(values);
@@ -141,6 +167,43 @@ export default function RegisterPatner({ navigation, route }) {
                                     value={image}
                                 />
                                 <View style={tw`w-full px-8`}>
+                                    <View style={tw`border border-slate-300 p-4 rounded-lg mt-3`}>
+
+                                        <Input
+                                            disable={true}
+                                            errors={errors.address}
+                                            touched={touched.address}
+                                            values={location ? String(location.address) : null}
+                                            style={tw`py-2`}
+                                            handleChange={handleChange}
+                                            handleBlur={handleBlur}
+                                            label="Alamat"
+                                            name="address" />
+                                        <Input
+                                            disable={true}
+                                            errors={errors.lat}
+                                            touched={touched.lat}
+                                            values={location ? String(location.location.lat) : values.lat}
+                                            handleChange={handleChange}
+                                            handleBlur={handleBlur}
+                                            label="Latitude"
+                                            name="lat" />
+                                        <Input
+                                            disable={true}
+                                            errors={errors.lng}
+                                            touched={touched.lng}
+                                            values={location ? String(location.location.lng) : values.lng}
+                                            handleChange={handleChange}
+                                            handleBlur={handleBlur}
+                                            label="Longitude"
+                                            name="lng" />
+
+                                        <TouchableOpacity style={tw`bg-slate-600 py-3 rounded-xl rounded-tr-xl flex-row justify-center py-2 px-2 ml-auto mt-2 items-center flex`} onPress={() => navigation.navigate('SelectLocation')} >
+                                            <MaterialIcons name="location-pin" size={24} color="black" />
+                                            <Text style={tw`text-white text-center ml-2`}>Pilih Lokasi</Text>
+                                        </TouchableOpacity>
+                                    </View>
+
                                     <Input
                                         errors={errors.name}
                                         touched={touched.name}
@@ -167,38 +230,19 @@ export default function RegisterPatner({ navigation, route }) {
                                         }}
                                     />
 
-                                    <View style={tw`border border-slate-300 p-4 rounded-lg mt-3`}>
 
-                                        <Input
-                                            disable={true}
-                                            errors={errors.address}
-                                            touched={touched.address}
-                                            values={values.address}
-                                            handleChange={handleChange}
-                                            handleBlur={handleBlur}
-                                            label="Alamat"
-                                            name="address" />
-                                        <Input
-                                            disable={true}
-                                            errors={errors.latlang}
-                                            touched={touched.latlang}
-                                            values={values.latlang}
-                                            handleChange={handleChange}
-                                            handleBlur={handleBlur}
-                                            label="Latitude longitude"
-                                            name="latlang" />
-
-                                        <TouchableOpacity style={tw`bg-slate-600  w-py-3 rounded-xl rounded-tr-xl flex-row justify-center py-2 px-2 ml-auto mt-2 items-center flex`} onPress={() => navigation.navigate('SelectLocation')} >
-                                            <MaterialIcons name="location-pin" size={24} color="black" />
-                                            <Text style={tw`text-white text-center ml-2`}>Pilih Lokasi</Text>
-                                        </TouchableOpacity>
-                                    </View>
                                 </View>
                             </View>
                         </ScrollView>
-                        <TouchableOpacity style={tw`absolute bg-purple-600  w-full py-3 bottom-0 rounded-tl-xl rounded-tr-xl flex-row justify-center`} onPress={handleSubmit} >
-                            <MaterialIcons name="edit" size={20} color="white" style={tw`mt-1`} />
-                            <Text style={tw`text-white text-lg text-center ml-3`}>Gabung Mitra</Text>
+                        <TouchableOpacity style={tw`absolute bg-purple-600  w-full py-3 bottom-0 rounded-tl-xl rounded-tr-xl flex-row justify-center`} disabled={loading} onPress={handleSubmit} >
+                            {loading ? (
+                                <ActivityIndicator size="large" color="#ffffff" />
+                            ) : (
+                                <>
+                                    <MaterialIcons name="edit" size={20} color="white" style={tw`mt-1`} />
+                                    <Text style={tw`text-white text-lg text-center ml-3`}>Gabung Mitra</Text>
+                                </>
+                            )}
                         </TouchableOpacity>
                     </>
                 )}
@@ -207,17 +251,18 @@ export default function RegisterPatner({ navigation, route }) {
     );
 }
 
-const Input = ({ label, errors, touched, values, name, handleChange, handleBlur, type, disable }) => {
+const Input = ({ label, errors, touched, values, name, handleChange, handleBlur, type, disable, hidden, style }) => {
     return (
         <>
-            <Text style={tw`mb-2 mt-3 text-slate-500`}>{label}</Text>
+            <Text style={tw`mb-2 mt-3 text-slate-500  ${hidden ? 'hidden' : null}`}>{label}</Text>
             {errors && touched ? <Text style={tw`text-red-400`}>{errors}</Text> : null}
             <TextInput
+                multiline
                 {...disable ? { editable: false } : null}
                 name={name}
                 {...type == "password" ? { secureTextEntry: true } : null}
                 {...type == "email" ? { keyboardType: 'email-address' } : null}
-                style={tw`border  ${errors && touched ? 'border-red-400' : 'border-slate-300'} w-full rounded-lg px-3`}
+                style={[tw`border  ${errors && touched ? 'border-red-400' : 'border-slate-300'} w-full rounded-lg px-3 ${hidden ? 'hidden' : null}`, style]}
                 onChangeText={handleChange(name)}
                 onBlur={handleBlur(name)}
                 value={values}
@@ -245,9 +290,9 @@ const EditSchema = Yup.object().shape({
     phone: Yup.string()
         .required('Required'),
     address: Yup.string()
-        .min(8, 'Terlalu pendek!')
         .required('Required'),
-    latlang: Yup.string()
-        .min(8, 'Terlalu pendek!')
+    lat: Yup.string()
+        .required('Required'),
+    lng: Yup.string()
         .required('Required'),
 });

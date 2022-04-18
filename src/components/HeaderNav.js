@@ -3,10 +3,10 @@ import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import tw from 'twrnc';
 
-export default function HeaderNav({ title, navigation }) {
+export default function HeaderNav({ title, navigation, backto }) {
     const handleGoback = () => {
         try {
-            navigation.pop();
+            backto ? navigation.navigate(backto) : navigation.pop();
         } catch (error) {
             console.log(error)
         }

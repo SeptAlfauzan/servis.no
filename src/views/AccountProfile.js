@@ -123,7 +123,7 @@ export default function AccountProfile({ navigation }) {
                     <Text style={tw`text-slate-600 self-center ml-5`}>History pesanan</Text>
                 </PressableMenu>
 
-                <PressableMenu handleOnPress={() => navigation.navigate('RegisterPatner')}>
+                <PressableMenu handleOnPress={() => navigation.navigate('RegisterPatner', { username })}>
                     <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
                         <MaterialIcons name="home-repair-service" size={18} color="black" />
                     </View>
