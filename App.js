@@ -23,6 +23,8 @@ import EditAccount from './src/views/EditAccount';
 import RegisterPatner from './src/views/RegisterPatner';
 import SelectLocation from './src/views/SelectLocation';
 import ScanQR from './src/views/ScanQR';
+import MakeOrder from './src/views/MakeOrder';
+import ProcessOrder from './src/views/ProcessOrder';
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +64,8 @@ export default function App() {
         <Stack.Screen name='RegisterPatner' component={RegisterPatner} />
         <Stack.Screen name='SelectLocation' component={SelectLocation} />
         <Stack.Screen name='ScanQR' component={ScanQR} />
+        <Stack.Screen name='MakeOrder' component={MakeOrder} />
+        <Stack.Screen name='ProcessOrder' component={ProcessOrder} />
       </Stack.Navigator>
     </NavigationContainer>
   );

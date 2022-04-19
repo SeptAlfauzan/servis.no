@@ -119,8 +119,7 @@ export default function SwipeUpDrawer(props) {
                 </PanGestureHandler>
             </GestureHandlerRootView>
             {data && (
-                <TouchableOpacity style={[tw`w-full bg-purple-600  mt-10 px-18 py-5 rounded absolute z-10 bottom-0 rounded-t-xl flex-row justify-between`, {
-                }]}>
+                <TouchableOpacity style={[tw`w-full bg-purple-600  mt-10 px-18 py-5 rounded absolute z-10 bottom-0 rounded-t-xl flex-row justify-between`]} onPress={() => props.navigation.navigate('MakeOrder')}>
                     <Text style={tw`text-white font-bold text-lg`}>
                         Buat Pesanan baru
                     </Text>

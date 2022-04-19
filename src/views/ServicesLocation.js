@@ -56,7 +56,7 @@ export default function ServicesLocation({ lat, lng, navigation }) {
     const resetFilter = () => setPatners(unfilterPatners);
     return (
 
-        <SwipeUpDrawer placeholderText={'Pilih tempat servis'} data={details}>
+        <SwipeUpDrawer placeholderText={'Pilih tempat servis'} data={details} navigation={navigation}>
 
             <View style={[styles.container, tw`flex min-h-full w-full relative`]}>
                 {/* filter component */}
