@@ -14,7 +14,7 @@ function MapMarker({ latitude, longitude, handleClick, placename, data }) {
             {/* on tap on marker */}
             <Callout onPress={e => console.log('e')}>
                 <View>
-                    <Text>Location one</Text>
+                    <Text>{data.name}</Text>
                 </View>
             </Callout>
         </Marker>

@@ -40,6 +40,7 @@ export default function Map({ navigation }) {
     }
 
     const handleChange = (e) => {
+        console.log(e.nativeEvent, location)
         const { coordinate } = e.nativeEvent;
         setLocation({ coords: coordinate });
     }
@@ -48,8 +49,21 @@ export default function Map({ navigation }) {
         try {
             const res = await reverseGeocode(location);
             const result = res.results.filter(data => data.location_type == "approximate");
-            // console.log(result);
-            setLocationDetail(result[0]);
+            const { address, area, country, region } = result[0]
+            const { latitude, longitude } = location.coords;
+            const final = {
+                address,
+                area,
+                country,
+                location: {
+                    lat: latitude,
+                    lng: longitude
+                },
+                region
+            }
+            console.log('result', final);
+            // console.log('result', result[0]);
+            setLocationDetail(final);
         } catch (error) {
             console.log(error.message);
         }

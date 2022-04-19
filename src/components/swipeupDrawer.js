@@ -1,20 +1,37 @@
 import React from 'react';
-import { View, ToastAndroid, Dimensions, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, ToastAndroid, Dimensions, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import tw from 'twrnc';
+import { API_URL } from 'react-native-dotenv';
 
 import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import {
     GestureHandlerRootView,
     PanGestureHandler,
 } from 'react-native-gesture-handler';
+import axios from 'axios';
 
 const height = Dimensions.get('window').height;
 export default function SwipeUpDrawer(props) {
     const { data } = props;
+    const [ordercount, setOrdercount] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
     const initialHeight = height + (height * 1 / 8);
     const fullHeight = height * 3 / 4;
     const y = useSharedValue(initialHeight);
+
+    React.useEffect(async () => {
+        try {
+            setLoading(true)
+            const res = await axios.get(`https://servisno.herokuapp.com/api/orders/not-finished/${data.id}`);
+            console.log(res)
+            console.log(res.data.data.length)
+            setOrdercount(res.data.data.length)
+            setLoading(false)
+        } catch (error) {
+            console.log(error.message)
+        }
+    }, [data])
 
     const gestureHandler = useAnimatedGestureHandler({
         onStart: (event, context) => {
@@ -63,11 +80,15 @@ export default function SwipeUpDrawer(props) {
                             (
                                 <>
 
+                                    <Text style={tw`text-xl text-black text-left mb-3 mr-auto`}>{data.name}</Text>
                                     <View style={tw`flex flex-row justify-between w-full`}>
-                                        <View style={tw`w-6/12 h-30 rounded-lg bg-slate-300`}></View>
+                                        <Image
+                                            style={tw`w-6/12 h-30 rounded-lg bg-slate-300`}
+                                            source={{
+                                                uri: `${API_URL}${data.photo}` || 'https://reactnative.dev/img/tiny_logo.png',
+                                            }}></Image>
                                         <View style={tw`w-5/12 h-30 flex justify-between`}>
-                                            <Text style={tw`text-xl text-black`}>{data.name}</Text>
-                                            <Text style={tw`text-sm text-black`}>{data.address}</Text>
+                                            <Text style={tw`text-sm text-slate-400`}>{data.address}</Text>
                                             <View >
                                                 <Text style={tw`text-sm text-slate-500`}>{data.star}</Text>
                                             </View>
@@ -77,7 +98,11 @@ export default function SwipeUpDrawer(props) {
                                         {/* orders */}
                                         <View style={tw`w-full bg-slate-100 rounded h-20 flex flex-row justify-between items-center px-10 rounded`}>
                                             <Text style={tw`text-left text-lg w-3/5`}>Jumlah Antrian Saat ini</Text>
-                                            <Text style={tw`text-4xl`}>10</Text>
+                                            {loading ? (
+                                                <ActivityIndicator size="large" color="#ffffff" />
+                                            ) : (
+                                                <Text style={tw`text-4xl`}>{ordercount}</Text>
+                                            )}
                                         </View>
                                     </View>
                                     <View style={tw`mt-10 w-full`}>

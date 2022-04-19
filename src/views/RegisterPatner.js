@@ -97,7 +97,7 @@ export default function RegisterPatner({ navigation, route }) {
             //         'Content-Type': 'multipart/form-data; boundary=6ff46e0b6b5148d984f148b6542e5a5d',
             //     },
             // };
-            fetch('https://c087-103-141-108-25.ngrok.io/api/patners', {
+            fetch('https://servisno.herokuapp.com/api/patners', {
                 method: "POST",
                 body: formData
             }).then(response => {

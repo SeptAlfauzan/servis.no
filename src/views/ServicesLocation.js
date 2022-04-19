@@ -1,12 +1,13 @@
 import * as React from 'react';
 import MapView, { Callout, Marker } from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import tw from 'twrnc';
 import MapStyles from '../utils/mapStyle';
 import DummyData from '../utils/dummyData';
 import SwipeUpDrawer from '../components/swipeupDrawer';
 import CustomMarker from '../components/mapMarker';
 import { MaterialIcons } from '@expo/vector-icons';
+import axios from 'axios';
 
 const height = Dimensions.get('screen').height;
 
@@ -22,10 +23,23 @@ export default function ServicesLocation({ lat, lng, navigation }) {
     const mapStyle = MapStyles.default();
 
     React.useEffect(async () => {
-        const data = await DummyData.getData(lat, lng);
-        setPatners(JSON.parse(data));
-        setUnfilterPatners(patners);
+        try {
+            const { data } = await axios.get('https://servisno.herokuapp.com/api/patners');
+
+            setPatners(data.data)
+
+            data.data.map(data => {
+                console.log(parseFloat(data.lat), parseFloat(data.lng))
+            });
+
+        } catch (error) {
+            Alert(error.message);
+        }
     }, []);
+
+    React.useEffect(() => {
+        console.log(patners);
+    }, [patners])
 
     const handleMakersClick = (arg) => {
         setDetails(arg);
@@ -79,16 +93,17 @@ export default function ServicesLocation({ lat, lng, navigation }) {
                             </View>
                         </Callout>
                     </Marker>
+
                     {patners && patners.map((data, index) => (
                         <View key={index}>
-                            <CustomMarker data={data} placename={data.name} latitude={data.latitude} longitude={data.longitude} handleClick={handleMakersClick} />
+                            <CustomMarker data={data} placename={data.name} latitude={Number(data.lat)} longitude={Number(data.lng)} handleClick={handleMakersClick} />
                         </View>
                     )
                     )}
                 </MapView>
 
             </View>
-        </SwipeUpDrawer>
+        </SwipeUpDrawer >
     );
 }
 
