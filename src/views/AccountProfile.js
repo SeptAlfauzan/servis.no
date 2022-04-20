@@ -27,6 +27,7 @@ export default function AccountProfile({ navigation }) {
     const [username, setUsername] = React.useState(null);
     const [user, setUser] = React.useState({});
     const [loading, setLoading] = React.useState(true);
+    const [ispatner, setIspatner] = React.useState(false);
 
     const modalPopup = React.useRef(null);
 
@@ -34,6 +35,9 @@ export default function AccountProfile({ navigation }) {
         try {
             await AsyncStorage.removeItem('@authorized');
             await AsyncStorage.removeItem('@access-token');
+            await AsyncStorage.removeItem('@username');
+            await AsyncStorage.removeItem('@is-patner');
+            // AsyncStorage.setItem('@nextLaunch', 'true');
 
             navigation.navigate('Login');
         } catch (error) {
@@ -43,6 +47,10 @@ export default function AccountProfile({ navigation }) {
 
     React.useEffect(async () => {
         try {
+            // check if account already register as patner
+            const patner = await AsyncStorage.getItem('@is-patner');
+            patner ? setIspatner(true) : null;
+
             const getusername = await AsyncStorage.getItem('@username');
             setUsername(getusername);
 
@@ -122,13 +130,14 @@ export default function AccountProfile({ navigation }) {
                     </View>
                     <Text style={tw`text-slate-600 self-center ml-5`}>History pesanan</Text>
                 </PressableMenu>
-
-                <PressableMenu handleOnPress={() => navigation.navigate('RegisterPatner', { username })}>
-                    <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
-                        <MaterialIcons name="home-repair-service" size={18} color="black" />
-                    </View>
-                    <Text style={tw`text-slate-600 self-center ml-5`}>Daftar sebagai mitra</Text>
-                </PressableMenu>
+                {!ispatner && (
+                    <PressableMenu handleOnPress={() => navigation.navigate('RegisterPatner', { username })}>
+                        <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>
+                            <MaterialIcons name="home-repair-service" size={18} color="black" />
+                        </View>
+                        <Text style={tw`text-slate-600 self-center ml-5`}>Daftar sebagai mitra</Text>
+                    </PressableMenu>
+                )}
 
                 <PressableMenu handleOnPress={() => modalPopup.current.toggleShow()}>
                     <View style={tw`bg-slate-50 w-10 flex items-center p-2`}>

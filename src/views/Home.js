@@ -6,8 +6,18 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Navbar from '../components/Navbar';
 import { AntDesign } from '@expo/vector-icons';
 import HistoryOrderScreen from './HistoryOrder';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AccountCheck from '../utils/checkAccountPatner';
 
 const HomeScreen = ({ navigation }) => {
+    const [ispatner, setIspatner] = React.useState(false);
+
+    React.useEffect(async () => {
+        const patner = await AccountCheck.isPatner();
+        patner ? setIspatner(true) : null;
+        console.log(ispatner)
+    }, [])
+
     return (
         <View
             style={tw`flex h-full w-full relative relative bg-blue-200 py-10 px-3`}
@@ -47,19 +57,21 @@ const HomeScreen = ({ navigation }) => {
                     </TouchableOpacity>
                     <Text style={tw`text-xs`}>make order</Text>
                 </View>
-                <View style={tw`flex items-center`}>
-                    <TouchableOpacity
-                        style={tw`bg-slate-300 rounded-lg w-20 h-20 flex justify-center items-center m-2 p-2`}
-                        onPress={() => navigation.navigate('ProcessOrder')
-                        }>
-                        <Image
-                            resizeMode='contain'
-                            style={tw`w-12 h-12 self-center`}
-                            source={require('./../../assets/illustrations/icons/note.png')}
-                        />
-                    </TouchableOpacity>
-                    <Text style={tw`text-xs`}>Process orders</Text>
-                </View>
+                {ispatner && (
+                    <View style={tw`flex items-center`}>
+                        <TouchableOpacity
+                            style={tw`bg-slate-300 rounded-lg w-20 h-20 flex justify-center items-center m-2 p-2`}
+                            onPress={() => navigation.navigate('ProcessOrder')
+                            }>
+                            <Image
+                                resizeMode='contain'
+                                style={tw`w-12 h-12 self-center`}
+                                source={require('./../../assets/illustrations/icons/note.png')}
+                            />
+                        </TouchableOpacity>
+                        <Text style={tw`text-xs`}>Process orders</Text>
+                    </View>
+                )}
             </View>
         </View >
 

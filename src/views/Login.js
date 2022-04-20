@@ -24,7 +24,7 @@ export default function Login({ navigation }) {
                 setLoading(false);
                 return data;
             });
-            console.log(response)
+            // console.log(response)
             await AsyncStorage.setItem('@authorized', response.data.message);
 
             const jwtToken = await axios.post(`${API_URL}api/auth/token`, { username: data.username });
@@ -32,7 +32,15 @@ export default function Login({ navigation }) {
             const jwtData = jwtToken.data;
             await AsyncStorage.setItem('@username', jwtData.username);
             await AsyncStorage.setItem('@access-token', jwtData['access-token']);
-
+            //check if user is also patner
+            const responseCheckIsPatner = await axios.get(`https://servisno.herokuapp.com/api/patners/one/${data.username}`,
+                {
+                    headers: {
+                        'authorization': jwtData['access-token']
+                    }
+                }
+            )
+            responseCheckIsPatner.data.data ? await AsyncStorage.setItem('@is-patner', 'yes') : null;
             // reset form
             setPeek(false);
             Keyboard.dismiss();
@@ -40,8 +48,9 @@ export default function Login({ navigation }) {
 
             navigation.navigate('Dashboard');
         } catch (error) {
-            console.log(error.response.data.message);
+            console.log(error);
             setErrorLogin(error.response.data.message);
+            setLoading(false);
         }
     }
 
