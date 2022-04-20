@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import tw from 'twrnc';
+import { useIsFocused } from '@react-navigation/native'
 
 export default function ScanQR({ navigation }) {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
+
+    const [isFocused, setIsFocused] = React.useState(true);
 
     useEffect(() => {
         (async () => {
             const { status } = await BarCodeScanner.requestPermissionsAsync();
             setHasPermission(status === 'granted');
         })();
+        return () => {
+            setIsFocused(false);
+        }
     }, []);
 
     const handleBarCodeScanned = ({ type, data }) => {
@@ -40,11 +46,13 @@ export default function ScanQR({ navigation }) {
             >
                 <Text style={tw`text-xl text-white text-center -top-10`}>Scan Here</Text>
             </View>
+            {/* {isFocused && (
+                <BarCodeScanner
+                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    style={tw`absolute h-full w-full`}
+                />
+            )} */}
 
-            <BarCodeScanner
-                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                style={tw`absolute h-full w-full`}
-            />
             {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
         </View>
     );

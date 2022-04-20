@@ -46,7 +46,9 @@ export default function Login({ navigation }) {
             Keyboard.dismiss();
             formik.current.resetForm();
 
-            navigation.navigate('Dashboard');
+            navigation.navigate('Dashboard', {
+                isPatner: responseCheckIsPatner.data.data
+            });
         } catch (error) {
             console.log(error);
             setErrorLogin(error.response.data.message);

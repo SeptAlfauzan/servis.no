@@ -7,6 +7,7 @@ import HeaderNav from '../components/HeaderNav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from 'react-native-dotenv';
+import AccountCheck from '../utils/checkAccountPatner';
 
 const PressableMenu = ({ children, handleOnPress }) => {
     return (
@@ -48,8 +49,7 @@ export default function AccountProfile({ navigation }) {
     React.useEffect(async () => {
         try {
             // check if account already register as patner
-            const patner = await AsyncStorage.getItem('@is-patner');
-            patner ? setIspatner(true) : null;
+            setIspatner(await AccountCheck.isPatner());
 
             const getusername = await AsyncStorage.getItem('@username');
             setUsername(getusername);

@@ -7,9 +7,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import axios, { Axios } from 'axios';
 import LoginForm from './src/components/loginForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoginSuccess from './src/screens/loginSuccess';
+import * as Notifications from 'expo-notifications';
 // view components
-import ServicesLocation from './src/views/ServicesLocation';
 import Map from './src/views/Map';
 import Login from './src/views/Login';
 import HomeDashboard from './src/views/Home';
@@ -25,8 +24,18 @@ import SelectLocation from './src/views/SelectLocation';
 import ScanQR from './src/views/ScanQR';
 import MakeOrder from './src/views/MakeOrder';
 import ProcessOrder from './src/views/ProcessOrder';
+import SetTransaction from './src/views/SetTransaction';
+import PushNotification from './src/utils/PushNotification';
 
 const Stack = createNativeStackNavigator();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function App() {
   const [authorized, SetAuthorized] = React.useState(false);
@@ -34,14 +43,25 @@ export default function App() {
   const handleLogout = () => SetAuthorized(false);
 
   React.useEffect(async () => {
+    //set up for notification listener
+    const token = await PushNotification.registerForPushNotificationsAsync();
+
+    Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
     SetAuthorized(Boolean(await AsyncStorage.getItem('@authorized')));
     const isntFirstLaunch = Boolean(await AsyncStorage.getItem('@nextLaunch'));
     isntFirstLaunch ? setFirstLaunch(false) : setFirstLaunch(true);
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+
+
   }, [])
-  // React.useEffect(() => {
-  //   console.log(navigationRef.current.getCurrentRoute().name);
-  //   setRoute(navigationRef.current.getCurrentRoute().name);
-  // })
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Onboard' screenOptions={{ headerShown: false }}>
@@ -66,6 +86,7 @@ export default function App() {
         <Stack.Screen name='ScanQR' component={ScanQR} />
         <Stack.Screen name='MakeOrder' component={MakeOrder} />
         <Stack.Screen name='ProcessOrder' component={ProcessOrder} />
+        <Stack.Screen name='SetTransaction' component={SetTransaction} />
       </Stack.Navigator>
     </NavigationContainer>
   );

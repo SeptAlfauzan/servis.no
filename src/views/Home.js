@@ -7,16 +7,8 @@ import Navbar from '../components/Navbar';
 import { AntDesign } from '@expo/vector-icons';
 import HistoryOrderScreen from './HistoryOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AccountCheck from '../utils/checkAccountPatner';
 
-const HomeScreen = ({ navigation }) => {
-    const [ispatner, setIspatner] = React.useState(false);
-
-    React.useEffect(async () => {
-        const patner = await AccountCheck.isPatner();
-        patner ? setIspatner(true) : null;
-        console.log(ispatner)
-    }, [])
+const HomeScreen = ({ navigation, ispatner }) => {
 
     return (
         <View
@@ -80,14 +72,19 @@ const HomeScreen = ({ navigation }) => {
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeDashboard({ navigation }) {
+export default function HomeDashboard({ navigation, route }) {
+
+    const { isPatner } = route.params || { isPatner: AsyncStorage.getItem('@is-patner') };
 
     return (
         <Tab.Navigator
+            initialRouteName='Home'
             screenOptions={{ headerShown: false }}
             tabBar={props => <Navbar {...props} />}
         >
-            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Home"
+                children={() => <HomeScreen ispatner={isPatner} navigation={navigation} />}
+            />
             <Tab.Screen name="History" component={HistoryOrderScreen} />
         </Tab.Navigator>
     );
