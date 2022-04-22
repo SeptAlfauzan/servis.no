@@ -7,6 +7,7 @@ import { API_URL } from 'react-native-dotenv';
 import axios from 'axios';
 import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
+import NotifToken from '../utils/NotifToken';
 
 export default function Login({ navigation }) {
     const [peek, setPeek] = React.useState(false);
@@ -24,14 +25,15 @@ export default function Login({ navigation }) {
                 setLoading(false);
                 return data;
             });
-            // console.log(response)
             await AsyncStorage.setItem('@authorized', response.data.message);
 
             const jwtToken = await axios.post(`${API_URL}api/auth/token`, { username: data.username });
-
             const jwtData = jwtToken.data;
             await AsyncStorage.setItem('@username', jwtData.username);
             await AsyncStorage.setItem('@access-token', jwtData['access-token']);
+            //insert notif token to DB            
+            const notifToken = await AsyncStorage.getItem('@notif-token');
+            const insertToken = await NotifToken.insertToken(jwtData.username, notifToken);
             //check if user is also patner
             const responseCheckIsPatner = await axios.get(`https://servisno.herokuapp.com/api/patners/one/${data.username}`,
                 {

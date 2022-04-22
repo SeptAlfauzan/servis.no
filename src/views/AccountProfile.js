@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from 'react-native-dotenv';
 import AccountCheck from '../utils/checkAccountPatner';
+import NotifToken from '../utils/NotifToken';
 
 const PressableMenu = ({ children, handleOnPress }) => {
     return (
@@ -34,6 +35,11 @@ export default function AccountProfile({ navigation }) {
 
     const handleLogout = async () => {
         try {
+            const username = await AsyncStorage.getItem('@username');
+            const notifToken = await AsyncStorage.getItem('@notif-token');
+
+            const deleteNotifToken = await NotifToken.deleteToken(username, notifToken);
+
             await AsyncStorage.removeItem('@authorized');
             await AsyncStorage.removeItem('@access-token');
             await AsyncStorage.removeItem('@username');

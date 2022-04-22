@@ -81,6 +81,7 @@ export default function SwipeUpDrawer(props) {
                                 <>
 
                                     <Text style={tw`text-xl text-black text-left mb-3 mr-auto`}>{data.name}</Text>
+                                    <Text style={tw`text-black text-left mb-3 mr-auto`}>Jarak {Number(data.distance).toFixed(2)} meter</Text>
                                     <View style={tw`flex flex-row justify-between w-full`}>
                                         <Image
                                             style={tw`w-6/12 h-30 rounded-lg bg-slate-300`}

@@ -1,6 +1,6 @@
 import React from 'react';
 import tw from 'twrnc';
-import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Navbar from '../components/Navbar';
@@ -37,10 +37,34 @@ export default function ProcessOrder({ navigation }) {
             const responseGetOrders = await axios.get(`https://servisno.herokuapp.com/api/orders/need-proceed/${patner.id}`);
             setData(responseGetOrders.data.data)
             console.log(responseGetOrders.data.data)
+
         } catch (error) {
-            console.log(error)
+            alert(`${error.message}, ${error.response.data}`);
+            setData([]);
         }
     }, [])
+
+    const navigateConfirm = (data) => navigation.navigate('ConfirmOrder', data);
+    const navigatePay = (data) => alert('navigate pay');
+    const navigateWorkOnProgress = (data) => alert('navigate work on progress');
+    const navigateDeliver = (data) => alert('navigate deliver');
+    // const navigateOrderFinish = (data) => alert('navigate order finish');
+
+    const handlePress = (arg) => {
+        if (!arg.confirmed) {
+            //belum dikonfirmasi
+            navigateConfirm(arg);
+        } else if (arg.confirmed && arg.order_status_id == 1) {
+            //belum dibayar
+            navigatePay(null);
+        } else if (arg.confirmed && arg.order_status_id == 2) {
+            //sudah dibayar
+            navigateWorkOnProgress(null);
+        } else if (arg.confirmed && arg.order_status_id == 3) {
+            //sudah dikerjakan
+            navigateDeliver(null);
+        }
+    }
 
     return (
         <>
@@ -72,7 +96,7 @@ export default function ProcessOrder({ navigation }) {
                             <TouchableOpacity
                                 key={d.id}
                                 onPress={() => {
-                                    modal.current.toggle();
+                                    handlePress(d);
                                 }}
                                 style={tw`max-h-30 w-full border border-slate-300 rounded-lg px-5 py-3 flex-row justify-between mb-2`}
                             >
@@ -83,7 +107,7 @@ export default function ProcessOrder({ navigation }) {
                                     {!d.confirmed ? (
                                         <Text style={tw`text-${color}-600 font-bold`}>Belum dikonfirmasi</Text>
                                     ) : (
-                                        <Text style={tw`text-${color}-600 font-bold`}>{d.progress_id}</Text>
+                                        <Text style={tw`text-${color}-600 font-bold`}>{d.order_status.name}</Text>
                                     )}
                                 </View>
                                 <View

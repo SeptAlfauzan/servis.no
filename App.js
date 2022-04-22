@@ -25,6 +25,8 @@ import ScanQR from './src/views/ScanQR';
 import MakeOrder from './src/views/MakeOrder';
 import ProcessOrder from './src/views/ProcessOrder';
 import SetTransaction from './src/views/SetTransaction';
+import ConfirmOrder from './src/views/Orders/Confirm';
+
 import PushNotification from './src/utils/PushNotification';
 
 const Stack = createNativeStackNavigator();
@@ -43,16 +45,18 @@ export default function App() {
   const handleLogout = () => SetAuthorized(false);
 
   React.useEffect(async () => {
-    //set up for notification listener
-    const token = await PushNotification.registerForPushNotificationsAsync();
-
-    Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
-
     SetAuthorized(Boolean(await AsyncStorage.getItem('@authorized')));
     const isntFirstLaunch = Boolean(await AsyncStorage.getItem('@nextLaunch'));
     isntFirstLaunch ? setFirstLaunch(false) : setFirstLaunch(true);
+
+    //set up for notification listener
+    const token = await PushNotification.registerForPushNotificationsAsync();
+    Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('response', response);
+    });
+
+    AsyncStorage.setItem('@notif-token', token);
+
 
     return () => {
       Notifications.removeNotificationSubscription(notificationListener.current);
@@ -87,6 +91,8 @@ export default function App() {
         <Stack.Screen name='MakeOrder' component={MakeOrder} />
         <Stack.Screen name='ProcessOrder' component={ProcessOrder} />
         <Stack.Screen name='SetTransaction' component={SetTransaction} />
+
+        <Stack.Screen name='ConfirmOrder' component={ConfirmOrder} />
       </Stack.Navigator>
     </NavigationContainer>
   );

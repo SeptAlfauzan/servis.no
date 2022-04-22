@@ -8,6 +8,7 @@ import SwipeUpDrawer from '../components/swipeupDrawer';
 import CustomMarker from '../components/mapMarker';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
+import * as Harvesine from 'haversine';
 
 const height = Dimensions.get('screen').height;
 
@@ -26,11 +27,21 @@ export default function ServicesLocation({ lat, lng, navigation }) {
         try {
             const { data } = await axios.get('https://servisno.herokuapp.com/api/patners');
 
-            setPatners(data.data)
 
-            data.data.map(data => {
-                console.log(parseFloat(data.lat), parseFloat(data.lng))
+            const dataWithDistance = data.data.map(data => {
+                // console.log(parseFloat(data.lat), parseFloat(data.lng))
+                data.distance = Harvesine.default({
+                    // start
+                    latitude: lat,
+                    longitude: lng
+                }, {
+                    // end
+                    latitude: Number(data.lat),
+                    longitude: Number(data.lng),
+                }, { unit: 'meter' });
+                return data;
             });
+            setPatners(dataWithDistance);
 
         } catch (error) {
             Alert(error.message);
