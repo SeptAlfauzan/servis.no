@@ -3,49 +3,59 @@ import { View, TextInput, Text, TouchableOpacity, Image, Button, ScrollView } fr
 import tw from 'twrnc';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import PhoneInput from 'react-native-phone-input';
-import { MaterialIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import HeaderNav from '../../components/HeaderNav';
+import ModalProcessOrder from '../../ModalProcessOrder';
+import axios from 'axios';
 
 export default function Confirm({ navigation, route }) {
     const data = route.params;
+    const modal = React.useRef(null);
 
-    const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        console.log(result);
-
-        if (!result.cancelled) {
-            setImage(result.uri);
+    const handleCancel = async (id) => {
+        try {
+            const response = await axios.put(`https://servisno.herokuapp.com/api/orders?id=${id}`, {
+                canceled: true
+            });
+            alert(`Order dibatalkan, anda akan dipindahkan ke halaman proses order`);
+            navigation.navigate('ProcessOrder');
+        } catch (error) {
+            alert(error.message);
         }
-    };
+    }
+    const handleConfirm = async (id, data) => {
+        try {
+            const response = await axios.put(`https://servisno.herokuapp.com/api/orders?id=${id}`, {
+                bill: data.ammount,
+                confirm: true,
+            });
+            alert(`Tagihan untuk pesanan telah ditambahkan, silahkan menunggu konfirmasi pembayaran dari klien`);
+            navigation.navigate('ProcessOrder');
+        } catch (error) {
+            alert(error.message);
+        }
+    }
 
     return (
         <View style={tw`flex min-h-full bg-slate-50`}>
             <HeaderNav title="Kofirmasi Pesanan" navigation={navigation} />
             <Formik
                 initialValues={{
-                    user_id: '',
-                    patner_id: '',
-                    order_id: '',
                     ammount: '',
                 }}
                 validationSchema={EditSchema}
                 onSubmit={values => {
                     // same shape as initial values
-                    console.log(values);
+                    handleConfirm(data.id, values);
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                     <>
                         <ScrollView style={tw`h-full w-full`}>
+                            <ModalProcessOrder ref={modal} submitStyle={tw`bg-red-600`} onSubmit={() => {
+                                handleCancel(data.id);
+                            }}>
+                                <Text>Apakah anda yakin ingin membatalkan pesanan ini?</Text>
+                            </ModalProcessOrder>
                             <View style={tw`mt-25 mb-20 flex items-center`}>
 
                                 <View style={tw`w-full px-8`}>
@@ -93,25 +103,33 @@ export default function Confirm({ navigation, route }) {
                                             <Text>Nomor Telp.</Text>
                                         </View>
                                     </View>
-
-                                    <Input
-                                        errors={errors.ammount}
-                                        touched={touched.ammount}
-                                        values={values.ammount}
-                                        handleChange={handleChange}
-                                        handleBlur={handleBlur}
-                                        type="number"
-                                        label="Biaya jasa"
-                                        name="ammount" />
+                                    <View>
+                                        <View
+                                            style={tw`bg-slate-300 w-10 flex items-center justify-center p-1 h-10 rounded-tl-lg rounded-bl-lg absolute bottom-0`}
+                                        >
+                                            <Text>Rp</Text>
+                                        </View>
+                                        <Input
+                                            errors={errors.ammount}
+                                            touched={touched.ammount}
+                                            values={values.ammount}
+                                            handleChange={handleChange}
+                                            handleBlur={handleBlur}
+                                            type="number"
+                                            label="Biaya jasa"
+                                            name="ammount" />
+                                    </View>
                                 </View>
                             </View>
                         </ScrollView>
-                        <TouchableOpacity style={tw`absolute bg-red-600  w-full py-3 bottom-0 rounded-tl-xl rounded-tr-xl flex-row justify-center`} onPress={null} >
-                            <Text style={tw`text-white text-lg text-center ml-3`}>Batalkan Order</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={tw`absolute bg-purple-600  w-full py-3 bottom-0 rounded-tl-xl rounded-tr-xl flex-row justify-center`} onPress={handleSubmit} >
-                            <Text style={tw`text-white text-lg text-center ml-3`}>Konfirmasi Order</Text>
-                        </TouchableOpacity>
+                        <View style={tw`flex-row w-full absolute bottom-0`}>
+                            <TouchableOpacity style={tw`w-1/2 bg-red-600  py-3  rounded-tl-xl rounded-tr-xl flex-row justify-center`} onPress={() => modal.current.toggle()} >
+                                <Text style={tw`text-white text-lg text-center ml-3`}>Batalkan Order</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={tw`w-1/2 bg-purple-600  py-3  rounded-tl-xl rounded-tr-xl flex-row justify-center`} onPress={handleSubmit} >
+                                <Text style={tw`text-white text-lg text-center ml-3`}>Konfirmasi Order</Text>
+                            </TouchableOpacity>
+                        </View>
                     </>
                 )}
             </Formik>
@@ -129,7 +147,7 @@ const Input = ({ label, errors, touched, values, name, handleChange, handleBlur,
                 {...type == "password" ? { secureTextEntry: true } : null}
                 {...type == "email" ? { keyboardType: 'email-address' } : null}
                 {...type == "number" ? { keyboardType: 'number-pad' } : null}
-                style={tw`border  ${errors && touched ? 'border-red-400' : 'border-slate-300'} w-full rounded-lg px-3`}
+                style={tw`border  ${errors && touched ? 'border-red-400' : 'border-slate-300'} w-full rounded-lg px-3 h-10 pl-12`}
                 onChangeText={handleChange(name)}
                 onBlur={handleBlur(name)}
                 value={values}
@@ -139,24 +157,6 @@ const Input = ({ label, errors, touched, values, name, handleChange, handleBlur,
 }
 
 const EditSchema = Yup.object().shape({
-    name: Yup.string()
-        .min(2, 'Terlalu pendek!')
-        .max(50, 'Terlalu panjang!')
-        .required('Required'),
-    username: Yup.string()
-        .min(2, 'Terlalu pendek!')
-        .max(50, 'Terlalu panjang!')
-        .required('Required'),
-    email: Yup.string().email('Invalid email').required('Required'),
-    password: Yup.string()
-        .min(8, 'Terlalu pendek!')
-        .required('Required'),
-    validate_password: Yup.string()
-        .min(8, 'Terlalu pendek!')
-        .required('Required'),
-    phone: Yup.string()
-        .required('Required'),
-    address: Yup.string()
-        .min(8, 'Terlalu pendek!')
+    ammount: Yup.number()
         .required('Required'),
 });

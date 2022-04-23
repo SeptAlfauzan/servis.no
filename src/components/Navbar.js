@@ -33,7 +33,7 @@ export default function Navbar({ state, descriptors, navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
                 style={tw`flex justify-center items-center w-20 py-1 rounded-full`}
-                onPress={() => navigation.navigate('ScanQR')}
+                onPress={() => navigation.navigate('ConfirmPayment')}
             >
                 <MaterialIcons name="qr-code" size={24} style={tw`${routename == 'Scan' ? 'text-white' : 'text-black'}`} />
                 <Text style={tw`text-xs`}>Scan</Text>

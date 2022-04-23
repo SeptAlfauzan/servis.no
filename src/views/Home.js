@@ -8,8 +8,15 @@ import { AntDesign } from '@expo/vector-icons';
 import HistoryOrderScreen from './HistoryOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HomeScreen = ({ navigation, ispatner }) => {
-
+const HomeScreen = ({ navigation }) => {
+    const [ispatner, setIspatner] = React.useState(false);
+    React.useEffect(() => {
+        navigation.addListener('focus',
+            async () => {
+                setIspatner(await AsyncStorage.getItem('@is-patner'));
+            }
+        )
+    }, []);
     return (
         <View
             style={tw`flex h-full w-full relative relative bg-blue-200 py-10 px-3`}
@@ -74,7 +81,6 @@ const Tab = createBottomTabNavigator();
 
 export default function HomeDashboard({ navigation, route }) {
 
-    const { isPatner } = route.params || { isPatner: AsyncStorage.getItem('@is-patner') };
 
     return (
         <Tab.Navigator
@@ -82,9 +88,7 @@ export default function HomeDashboard({ navigation, route }) {
             screenOptions={{ headerShown: false }}
             tabBar={props => <Navbar {...props} />}
         >
-            <Tab.Screen name="Home"
-                children={() => <HomeScreen ispatner={isPatner} navigation={navigation} />}
-            />
+            <Tab.Screen name="Home" component={HomeScreen} />
             <Tab.Screen name="History" component={HistoryOrderScreen} />
         </Tab.Navigator>
     );

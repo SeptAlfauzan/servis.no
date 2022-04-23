@@ -16,8 +16,8 @@ export default function SwipeUpDrawer(props) {
     const { data } = props;
     const [ordercount, setOrdercount] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
-    const initialHeight = height + (height * 1 / 8);
-    const fullHeight = height * 3 / 4;
+    const initialHeight = height + (height * 2 / 8);
+    const fullHeight = height * 4 / 5;
     const y = useSharedValue(initialHeight);
 
     React.useEffect(async () => {

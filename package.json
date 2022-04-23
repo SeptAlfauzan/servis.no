@@ -33,6 +33,7 @@
     "react-native": "0.64.3",
     "react-native-country-picker-modal": "^2.0.0",
     "react-native-dotenv": "^3.3.1",
+    "react-native-fs": "^2.19.0",
     "react-native-gesture-handler": "~2.1.0",
     "react-native-image-picker": "^4.7.3",
     "react-native-maps": "0.29.4",

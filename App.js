@@ -25,7 +25,9 @@ import ScanQR from './src/views/ScanQR';
 import MakeOrder from './src/views/MakeOrder';
 import ProcessOrder from './src/views/ProcessOrder';
 import SetTransaction from './src/views/SetTransaction';
+import ConfirmPayment from './src/views/ConfirmPayment';
 import ConfirmOrder from './src/views/Orders/Confirm';
+import DetailOrder from './src/views/Orders/Detail';
 
 import PushNotification from './src/utils/PushNotification';
 
@@ -93,6 +95,8 @@ export default function App() {
         <Stack.Screen name='SetTransaction' component={SetTransaction} />
 
         <Stack.Screen name='ConfirmOrder' component={ConfirmOrder} />
+        <Stack.Screen name='DetailOrder' component={DetailOrder} />
+        <Stack.Screen name='ConfirmPayment' component={ConfirmPayment} />
       </Stack.Navigator>
     </NavigationContainer>
   );

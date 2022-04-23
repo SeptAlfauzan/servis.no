@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "servis.no",
+    "scheme": "servisno",
     "slug": "servis-no",
     "version": "1.0.0",
     "orientation": "portrait",

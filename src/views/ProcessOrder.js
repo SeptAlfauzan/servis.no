@@ -42,7 +42,7 @@ export default function ProcessOrder({ navigation }) {
             alert(`${error.message}, ${error.response.data}`);
             setData([]);
         }
-    }, [])
+    }, [data])
 
     const navigateConfirm = (data) => navigation.navigate('ConfirmOrder', data);
     const navigatePay = (data) => alert('navigate pay');
@@ -82,19 +82,19 @@ export default function ProcessOrder({ navigation }) {
                 {data === null && (
                     <ActivityIndicator size="large" color="#ffffff" />
                 )}
-                {data && data.map(d => {
+                {data && data.map((d, index) => {
                     let color;
 
-                    if (d.progress_id == 0 || d.confirmed == false) {
+                    if (d.order_status_id == 1 && d.confirmed == false) {
                         color = 'red';
-                    } else if (d.progress_id == 1) {
+                    } else if (d.order_status_id == 1) {
                         color = 'yellow'
                     }
 
                     return (
                         <>
                             <TouchableOpacity
-                                key={d.id}
+                                key={index}
                                 onPress={() => {
                                     handlePress(d);
                                 }}
@@ -106,6 +106,8 @@ export default function ProcessOrder({ navigation }) {
                                     <Text style={tw`text-slate-600`}>Servis {d.gadget}</Text>
                                     {!d.confirmed ? (
                                         <Text style={tw`text-${color}-600 font-bold`}>Belum dikonfirmasi</Text>
+                                    ) : (d.bill > 0 && d.order_status_id == 1) ? (
+                                        <Text style={tw`text-${color}-600 font-bold`}>Menunggu pembayaran</Text>
                                     ) : (
                                         <Text style={tw`text-${color}-600 font-bold`}>{d.order_status.name}</Text>
                                     )}
@@ -124,7 +126,7 @@ export default function ProcessOrder({ navigation }) {
                         </>
                     )
                 })}
-                <TouchableOpacity
+                {/* <TouchableOpacity
                     onPress={() => {
                         modal.current.toggle();
                     }}
@@ -220,7 +222,7 @@ export default function ProcessOrder({ navigation }) {
                             source={require('./../../assets/illustrations/icons/cancel.png')}
                         />
                     </View>
-                </View>
+                </View> */}
             </ScrollView>
         </>
 

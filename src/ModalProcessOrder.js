@@ -28,19 +28,19 @@ const ModalProcessOrder = (props, ref) => {
 
                 <View style={styles.centeredView}>
                     <View style={[styles.modalView, tw`w-4/5`]}>
-                        <Text style={styles.modalText}>Hello World!</Text>
+                        {props.children}
                         <View
                             style={tw`flex-row w-full justify-between`}
                         >
                             <TouchableOpacity
                                 style={tw`w-5/11 bg-slate-300 flex items-center justify-center rounded-lg p-3`}
                                 onPress={() => setModalVisible(!modalVisible)}>
-                                <Text style={styles.textStyle}>Hide Modal</Text>
+                                <Text style={styles.textStyle}>{props.textBtnSecondary ? props.textBtnSecondary : 'hide modal'}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={tw`w-5/11 bg-green-300 flex items-center justify-center rounded-lg p-3`}
-                                onPress={() => setModalVisible(!modalVisible)}>
-                                <Text style={styles.textStyle}>Hide Modal</Text>
+                                style={[tw`w-5/11  flex items-center justify-center rounded-lg p-3`, props.submitStyle]}
+                                onPress={props.onSubmit}>
+                                <Text style={styles.textStyle}>{props.textBtnPrimary ? props.textBtnPrimary : 'hide modal'}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
