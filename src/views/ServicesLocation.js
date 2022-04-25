@@ -12,15 +12,33 @@ import * as Harvesine from 'haversine';
 
 const height = Dimensions.get('screen').height;
 
-const PlaceLabel = ({ data, index }) => (
-    <TouchableOpacity
-        key={index}
-        style={tw`bg-slate-50 px-4 py-2 mx-3 rounded-full`}
-    >
-        <Text>{data.name}</Text>
-        <Text>Jarak {Number(data.distance).toFixed(2)} meter</Text>
-    </TouchableOpacity>
-)
+
+const PlaceLabel = ({ data, index, mapRef, lngDelta, latDelta, setDetails }) => {
+    const handlePressLabel = (data) => {
+        const { lat, lng } = data;
+        console.log(lat, lng);
+
+        setDetails(data)
+
+        mapRef.current.animateToRegion({
+            latitude: Number(lat),
+            longitude: Number(lng),
+            latitudeDelta: latDelta,
+            longitudeDelta: lngDelta
+        })
+    }
+
+    return (
+        <TouchableOpacity
+            onPress={() => handlePressLabel(data, mapRef)}
+            key={index}
+            style={tw`bg-slate-50 px-4 py-2 ml-4 rounded-full`}
+        >
+            <Text>{data.name}</Text>
+            <Text>Jarak {Number(data.distance).toFixed(2)} meter</Text>
+        </TouchableOpacity>
+    )
+}
 
 export default function ServicesLocation({ lat, lng, navigation }) {
     const [patners, setPatners] = React.useState(null);
@@ -32,6 +50,8 @@ export default function ServicesLocation({ lat, lng, navigation }) {
     const LATITUDE_DELTA = 0.0028;//for zoom level, lesser mean more depth zoom
     const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
     const mapStyle = MapStyles.default();
+
+    const mapRef = React.useRef(null);
 
     React.useEffect(async () => {
         try {
@@ -102,7 +122,7 @@ export default function ServicesLocation({ lat, lng, navigation }) {
                         data={patners}
                         renderItem={({ item, index, separators }) => (
                             // <PlaceLabel data={item} index={index} />
-                            <PlaceLabel data={item} index={index} />
+                            <PlaceLabel data={item} index={index} mapRef={mapRef} latDelta={LATITUDE_DELTA} lngDelta={LONGITUDE_DELTA} setDetails={setDetails} />
                         )}
                     />
                 </View>
@@ -114,6 +134,7 @@ export default function ServicesLocation({ lat, lng, navigation }) {
                 </TouchableOpacity>
                 {/* end of filter component */}
                 <MapView
+                    ref={mapRef}
                     style={styles.map}
                     initialRegion={{
                         latitude: lat,
