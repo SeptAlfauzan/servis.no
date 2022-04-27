@@ -22,7 +22,7 @@ export default function Navbar({ state, descriptors, navigation }) {
 
     return (
         <View
-            style={tw`absolute self-center flex flex-row w-11/12 min-h-10 bg-slate-300 bottom-5 py-3 px-5 justify-between rounded-full`}
+            style={tw`absolute self-center flex flex-row w-11/12 min-h-10 bg-slate-300 bottom-5 py-3 px-10 justify-between rounded-full`}
         >
             <TouchableOpacity
                 style={tw`flex justify-center items-center w-20 py-1 rounded-full ${routename == 'Home' ? 'bg-purple-400' : null}`}
@@ -31,13 +31,13 @@ export default function Navbar({ state, descriptors, navigation }) {
                 <MaterialIcons name="home-filled" size={24} style={tw`${routename == 'Home' ? 'text-white' : 'text-black'}`} />
                 <Text style={tw`text-xs ${routename == 'Home' ? 'text-white' : 'text-black'}`}>Home</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={tw`flex justify-center items-center w-20 py-1 rounded-full`}
                 onPress={() => navigation.navigate('ConfirmPayment')}
             >
                 <MaterialIcons name="qr-code" size={24} style={tw`${routename == 'Scan' ? 'text-white' : 'text-black'}`} />
                 <Text style={tw`text-xs`}>Scan</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
                 style={tw`flex justify-center items-center w-20 py-1 rounded-full ${routename == 'History' ? 'bg-purple-400' : null}`}
                 onPress={() => navigate('History')}

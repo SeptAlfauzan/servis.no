@@ -42,7 +42,7 @@ export default function ProcessOrder({ navigation }) {
             alert(`${error.message}, ${error.response.data}`);
             setData([]);
         }
-    }, [data])
+    }, [])
 
     const navigateConfirm = (data) => navigation.navigate('ConfirmOrder', data);
     const navigatePay = (data) => alert('navigate pay');

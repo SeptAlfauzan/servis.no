@@ -24,9 +24,10 @@ export default function Confirm({ navigation, route }) {
     }
     const handleConfirm = async (id, data) => {
         try {
+            // set biaya dan status menjadi belum dibayar
             const response = await axios.put(`https://servisno.herokuapp.com/api/orders?id=${id}`, {
                 bill: data.ammount,
-                confirm: true,
+                order_status_id: 1
             });
             alert(`Tagihan untuk pesanan telah ditambahkan, silahkan menunggu konfirmasi pembayaran dari klien`);
             navigation.navigate('ProcessOrder');
