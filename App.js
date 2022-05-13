@@ -28,6 +28,7 @@ import SetTransaction from './src/views/SetTransaction';
 import ConfirmPayment from './src/views/ConfirmPayment';
 import ConfirmOrder from './src/views/Orders/Confirm';
 import DetailOrder from './src/views/Orders/Detail';
+import ChangeStatusOrder from './src/views/Orders/ChangeStatusOrder';
 
 import PushNotification from './src/utils/PushNotification';
 
@@ -96,6 +97,7 @@ export default function App() {
 
         <Stack.Screen name='ConfirmOrder' component={ConfirmOrder} />
         <Stack.Screen name='DetailOrder' component={DetailOrder} />
+        <Stack.Screen name='ChangeStatusOrder' component={ChangeStatusOrder} />
         <Stack.Screen name='ConfirmPayment' component={ConfirmPayment} />
       </Stack.Navigator>
     </NavigationContainer>

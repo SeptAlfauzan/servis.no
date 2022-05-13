@@ -21,31 +21,34 @@ export default function HistoryOrderScreen({ navigation }) {
     //         setTrigger(true);
     //     }, [])
     // );
+
+    const loadData = async () => {
+        try {
+            console.log('asdsd')
+            const getusername = await AsyncStorage.getItem('@username');
+            const token = await AsyncStorage.getItem('@access-token');
+
+            const responseUser = await axios.get(`${API_URL}api/users/user/${getusername}`,
+                {
+                    headers: {
+                        'authorization': token
+                    }
+                }
+            );
+            const { user } = responseUser.data;
+            const response = await axios.get(`https://servisno.herokuapp.com/api/orders/history/${user.id}`);
+
+            console.log('user', response.data.data)
+            setData(response.data.data);
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
     React.useEffect(() => {
 
         navigation.addListener('focus',
             async () => {
-
-                try {
-                    console.log('asdsd')
-                    const getusername = await AsyncStorage.getItem('@username');
-                    const token = await AsyncStorage.getItem('@access-token');
-
-                    const responseUser = await axios.get(`${API_URL}api/users/user/${getusername}`,
-                        {
-                            headers: {
-                                'authorization': token
-                            }
-                        }
-                    );
-                    const { user } = responseUser.data;
-                    const response = await axios.get(`https://servisno.herokuapp.com/api/orders/history/${user.id}`);
-
-                    console.log('user', response.data.data)
-                    setData(response.data.data);
-                } catch (error) {
-                    console.log(error.message)
-                }
+                await loadData();
             }
         )
     }, [data])
@@ -101,7 +104,7 @@ export default function HistoryOrderScreen({ navigation }) {
                         </View>
                         <View style={tw`flex-row w-full justify-between`}>
                             <Text style={tw`text-${color}-600 font-bold mt-3`}>
-                                {d.canceled ? 'Pesanan dibatalkan' : d.order_status.name}</Text>
+                                {d.canceled ? 'Pesanan dibatalkan' : d.confirmed ? d.order_status.name : 'Belum dikonfirmasi'}</Text>
                             <Text style={tw`text-slate-300 text-xs font-300 mt-3`}>Tap untuk detail</Text>
                         </View>
                     </TouchableOpacity>

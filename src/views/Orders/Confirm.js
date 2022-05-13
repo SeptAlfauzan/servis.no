@@ -27,7 +27,8 @@ export default function Confirm({ navigation, route }) {
             // set biaya dan status menjadi belum dibayar
             const response = await axios.put(`https://servisno.herokuapp.com/api/orders?id=${id}`, {
                 bill: data.ammount,
-                order_status_id: 1
+                order_status_id: 1,
+                confirmed: true,
             });
             alert(`Tagihan untuk pesanan telah ditambahkan, silahkan menunggu konfirmasi pembayaran dari klien`);
             navigation.navigate('ProcessOrder');

@@ -106,13 +106,7 @@ export default function SwipeUpDrawer(props) {
                                             )}
                                         </View>
                                     </View>
-                                    <View style={tw`mt-10 w-full`}>
-                                        <Text style={tw`text-left`}>Review</Text>
-                                        {/* orders */}
-                                        <View style={tw`w-full bg-slate-100 rounded h-30 flex flex-row justify-between items-center px-10`}>
-                                            <Text style={tw`text-4xl`}>10</Text>
-                                        </View>
-                                    </View>
+
                                 </>
                             )
                         }
@@ -120,7 +114,7 @@ export default function SwipeUpDrawer(props) {
                 </PanGestureHandler>
             </GestureHandlerRootView>
             {data && (
-                <TouchableOpacity style={[tw`w-full bg-purple-600  mt-10 px-18 py-5 rounded absolute z-10 bottom-0 rounded-t-xl flex-row justify-between`]} onPress={() => props.navigation.navigate('MakeOrder', { patner_id: data.id })}>
+                <TouchableOpacity style={[tw`w-full bg-purple-600  mt-10 px-18 py-5 rounded absolute z-10 bottom-0 rounded-t-xl flex-row justify-between`]} onPress={() => props.navigation.navigate('MakeOrder', { patner_id: data.id, order_status_id: 1 })}>
                     <Text style={tw`text-white font-bold text-lg`}>
                         Buat Pesanan baru
                     </Text>

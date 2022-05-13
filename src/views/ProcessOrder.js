@@ -1,6 +1,6 @@
 import React from 'react';
 import tw from 'twrnc';
-import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Navbar from '../components/Navbar';
@@ -11,16 +11,65 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from 'react-native-dotenv';
 
+
+const ItemList = (data) => {
+    const { item, handlePress } = data;
+    let color;
+
+    if (item.order_status_id == 1 && item.confirmed == false) {
+        color = 'red';
+    } else {
+        color = 'yellow'
+    }
+
+    return (
+        <>
+            <TouchableOpacity
+                onPress={() => {
+                    console.log(item);
+                    handlePress(item);
+                }}
+                style={tw`max-h-30 w-full border border-slate-300 rounded-lg px-5 py-3 flex-row justify-between mb-2`}
+            >
+                <View>
+                    <Text style={tw`text-slate-500`}>{item.createdAt}</Text>
+                    <Text style={tw`font-bold mt-2`}>{item.user == null ? '-' : item.user.name}</Text>
+                    <Text style={tw`text-slate-600`}>Servis {item.gadget}</Text>
+                    {!item.confirmed ? (
+                        <Text style={tw`text-${color}-600 font-bold`}>Belum dikonfirmasi</Text>
+                    ) : (item.bill > 0 && item.order_status_id == 1) ? (
+                        <Text style={tw`text-${color}-600 font-bold`}>Menunggu pembayaran</Text>
+                    ) : (
+                        <Text style={tw`text-${color}-600 font-bold`}>{item.order_status.name}</Text>
+                    )}
+                </View>
+                <View
+                    style={tw`bg-${color}-300 rounded-full w-13 h-13`}
+                >
+
+                    <Image
+                        resizeMode='contain'
+                        style={tw`w-14 h-14 self-center -left-2 top-3`}
+                        source={require('./../../assets/illustrations/icons/repairing.png')}
+                    />
+                </View>
+            </TouchableOpacity>
+        </>
+    )
+}
+
 export default function ProcessOrder({ navigation }) {
-    const [data, setData] = React.useState(null);
+    const [data, setData] = React.useState([]);
+    const [loading, setLoading] = React.useState(false);
+    const [refresh, setRefresh] = React.useState(false);
     const modal = React.useRef(null);
 
 
-    React.useEffect(async () => {
+    const loadData = async () => {
+        setLoading(true)
         try {
             const getusername = await AsyncStorage.getItem('@username');
             const token = await AsyncStorage.getItem('@access-token');
-
             const responseGetPatner = await axios.get(`${API_URL}api/patners/patner/${getusername}`,
                 {
                     headers: {
@@ -28,41 +77,46 @@ export default function ProcessOrder({ navigation }) {
                     }
                 }
             );
-
             const { patner } = responseGetPatner.data;
-
-            console.log(patner)
-
-
+            // console.log(patner)
             const responseGetOrders = await axios.get(`https://servisno.herokuapp.com/api/orders/need-proceed/${patner.id}`);
             setData(responseGetOrders.data.data)
-            console.log(responseGetOrders.data.data)
-
+            // console.log(responseGetOrders.data.data)
         } catch (error) {
             alert(`${error.message}, ${error.response.data}`);
             setData([]);
         }
+        setLoading(false);
+    }
+
+    React.useEffect(async () => {
+        navigation.addListener('focus', async () => {
+            await loadData();
+        });
+        await loadData();
     }, [])
 
     const navigateConfirm = (data) => navigation.navigate('ConfirmOrder', data);
-    const navigatePay = (data) => alert('navigate pay');
-    const navigateWorkOnProgress = (data) => alert('navigate work on progress');
-    const navigateDeliver = (data) => alert('navigate deliver');
-    // const navigateOrderFinish = (data) => alert('navigate order finish');
+    const navigateToChangeStatus = (data) => navigation.navigate('ChangeStatusOrder', data);
 
     const handlePress = (arg) => {
         if (!arg.confirmed) {
             //belum dikonfirmasi
             navigateConfirm(arg);
-        } else if (arg.confirmed && arg.order_status_id == 1) {
-            //belum dibayar
-            navigatePay(null);
         } else if (arg.confirmed && arg.order_status_id == 2) {
             //sudah dibayar
-            navigateWorkOnProgress(null);
+            console.log('data dikirim', arg)
+            navigateToChangeStatus({
+                data: arg,
+                text: 'Sedang Dikerjakan'
+            });
         } else if (arg.confirmed && arg.order_status_id == 3) {
             //sudah dikerjakan
-            navigateDeliver(null);
+            console.log('data dikirim', arg)
+            navigateToChangeStatus({
+                data: arg,
+                text: 'Diantar'
+            });
         }
     }
 
@@ -70,63 +124,27 @@ export default function ProcessOrder({ navigation }) {
         <>
             <ModalProcessOrder ref={modal} />
             <HeaderNav title="Process Order" navigation={navigation} />
-            <ScrollView
-                bounces={true}
-                // alwaysBounceHorizontal={true}
-                contentContainerStyle={tw`items-center flex relative px-8 py-14`}
-                style={tw`w-full `}
+            <View
+                style={tw`flex h-full w-full justify-center items-center`}
             >
-                {(data && data.length == 0) && (
+                {(!loading && data.length == 0) && (
                     <Text>No Order</Text>
                 )}
-                {data === null && (
-                    <ActivityIndicator size="large" color="#ffffff" />
+                {(loading || refresh) && (
+                    <ActivityIndicator style={tw`absolute top-50`} size="large" color="#ffffff" />
                 )}
-                {data && data.map((d, index) => {
-                    let color;
-
-                    if (d.order_status_id == 1 && d.confirmed == false) {
-                        color = 'red';
-                    } else if (d.order_status_id == 1) {
-                        color = 'yellow'
-                    }
-
-                    return (
-                        <>
-                            <TouchableOpacity
-                                key={index}
-                                onPress={() => {
-                                    handlePress(d);
-                                }}
-                                style={tw`max-h-30 w-full border border-slate-300 rounded-lg px-5 py-3 flex-row justify-between mb-2`}
-                            >
-                                <View>
-                                    <Text style={tw`text-slate-500`}>{d.createdAt}</Text>
-                                    <Text style={tw`font-bold mt-2`}>{d.user == null ? '-' : d.user.name}</Text>
-                                    <Text style={tw`text-slate-600`}>Servis {d.gadget}</Text>
-                                    {!d.confirmed ? (
-                                        <Text style={tw`text-${color}-600 font-bold`}>Belum dikonfirmasi</Text>
-                                    ) : (d.bill > 0 && d.order_status_id == 1) ? (
-                                        <Text style={tw`text-${color}-600 font-bold`}>Menunggu pembayaran</Text>
-                                    ) : (
-                                        <Text style={tw`text-${color}-600 font-bold`}>{d.order_status.name}</Text>
-                                    )}
-                                </View>
-                                <View
-                                    style={tw`bg-${color}-300 rounded-full w-13 h-13`}
-                                >
-
-                                    <Image
-                                        resizeMode='contain'
-                                        style={tw`w-14 h-14 self-center -left-2 top-3`}
-                                        source={require('./../../assets/illustrations/icons/repairing.png')}
-                                    />
-                                </View>
-                            </TouchableOpacity>
-                        </>
-                    )
-                })}
-                {/* <TouchableOpacity
+                {(!loading && data.length > 0) && (
+                    <FlatList
+                        data={data}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={(props) => <ItemList {...props} handlePress={handlePress} />}
+                        alwaysBounceHorizontal={true}
+                        contentContainerStyle={tw`items-start flex relative px-8 py-14`}
+                        style={tw`w-full`}
+                    />
+                )}
+            </View>
+            {/* <TouchableOpacity
                     onPress={() => {
                         modal.current.toggle();
                     }}
@@ -223,7 +241,6 @@ export default function ProcessOrder({ navigation }) {
                         />
                     </View>
                 </View> */}
-            </ScrollView>
         </>
 
     );

@@ -10,10 +10,10 @@ import QRCode from 'react-native-qrcode-svg';
 import { CameraRoll, ToastAndroid } from "react-native"
 // import RNFS from "react-native-fs"
 
-export default function Detail({ navigation, route }) {
-    const data = route.params;
-    const modalPay = React.useRef(null);
-    const modalFinish = React.useRef(null);
+export default function ChangeStatusOrder({ navigation, route }) {
+    const { data } = route.params;
+    const { text } = route.params;
+    const modalChangeStatus = React.useRef(null);
     const modalCancel = React.useRef(null);
 
     const handleCancel = async (id) => {
@@ -23,7 +23,7 @@ export default function Detail({ navigation, route }) {
             });
             console.log(response)
             alert(`Order dibatalkan`);
-            navigation.navigate('History');
+            navigation.navigate('ProcessOrder');
         } catch (error) {
             alert(error.message);
         }
@@ -34,33 +34,15 @@ export default function Detail({ navigation, route }) {
         try {
             const {
                 id,
-                bill,
-                user_id,
-                patner_id,
+                order_status_id
             } = data;
-            await axios.post(`https://servisno.herokuapp.com/api/orders/pay-order/${id}`, {
-                order_status_id: 2,
-                amount: bill,
-                user_id,
-                patner_id,
-                order_id: id
-            });
-            alert(`Transaksi berhasil`);
-            navigation.navigate('History');
-        } catch (error) {
-            alert(error.message);
-        }
-    }
-    const handleFinishOrder = async (data) => {
-        try {
-            const {
-                id
-            } = data;
+
             await axios.put(`https://servisno.herokuapp.com/api/orders?id=${id}`, {
-                order_status_id: 5,
+                order_status_id: order_status_id + 1,
             });
-            alert(`Yay! Pesanan anda telah selesai.`);
-            navigation.navigate('History');
+
+            alert(`Berhasil mengganti status pesanan`);
+            navigation.navigate('ProcessOrder');
         } catch (error) {
             alert(error.message);
         }
@@ -73,23 +55,13 @@ export default function Detail({ navigation, route }) {
             <>
                 <ScrollView style={tw`h-full w-full`}>
                     <ModalProcessOrder
-                        ref={modalPay}
+                        ref={modalChangeStatus}
                         submitStyle={tw`bg-purple-600`}
                         textBtnPrimary="Lanjutkan"
                         textBtnSecondary="Batal"
                         onSubmit={() => handleConfirm(data)}>
                         <Text style={tw`mb-3`}>
-                            Tap 'Lanjutkan' untuk memproses transaksi anda.
-                        </Text>
-                    </ModalProcessOrder>
-                    <ModalProcessOrder
-                        ref={modalFinish}
-                        submitStyle={tw`bg-purple-600`}
-                        textBtnPrimary="Lanjutkan"
-                        textBtnSecondary="Batal"
-                        onSubmit={() => handleFinishOrder(data)}>
-                        <Text style={tw`mb-3`}>
-                            Tap 'Lanjutkan' untuk menyelesaikan pesanan anda.
+                            Tap 'Lanjutkan' untuk mengganti status transaksi ini menjadi '{text}'
                         </Text>
                     </ModalProcessOrder>
                     <ModalProcessOrder
@@ -103,7 +75,14 @@ export default function Detail({ navigation, route }) {
                         </Text>
                     </ModalProcessOrder>
                     <View style={Style.container}>
-
+                        {data.canceled ?
+                            (<Text style={tw`mr-auto left-8 text-red-600`}>
+                                Pesanan dibatalkan
+                            </Text>) : (
+                                <Text style={tw`mr-auto left-8 text-green-600`}>
+                                    Status pesanan: {data.order_status.name}
+                                </Text>
+                            )}
                         <View style={tw`w-full px-8`}>
                             <Text
                                 style={Style.textLgBold}
@@ -124,28 +103,6 @@ export default function Detail({ navigation, route }) {
                                 <View style={Style.textcontainer}>
                                     <Text style={Style.textSlate300}>Nomor Telp.</Text>
                                     <Text>{data.user.phone}</Text>
-                                </View>
-                            </View>
-
-                            <Text
-                                style={Style.textLgBold}
-                            >
-                                Mitra Servis
-                            </Text>
-                            <View
-                                style={Style.descBoxContainer}
-                            >
-                                <View style={Style.textcontainer}>
-                                    <Text style={Style.textSlate300}>Nama</Text>
-                                    <Text>{data.patner.name}</Text>
-                                </View>
-                                <View style={Style.textcontainer}>
-                                    <Text style={Style.textSlate300}>Alamat</Text>
-                                    <Text style={tw`flex-1 flex-wrap text-right`}>{data.patner.address}</Text>
-                                </View>
-                                <View style={Style.textcontainer}>
-                                    <Text style={Style.textSlate300}>Nomor Telp.</Text>
-                                    <Text>{data.bill}</Text>
                                 </View>
                             </View>
 
@@ -183,41 +140,21 @@ export default function Detail({ navigation, route }) {
                         </View>
                     </View>
                 </ScrollView>
-                {data.canceled ?
-                    (<Text style={tw`absolute top-20 left-10 text-red-600`}>
-                        Pesanan dibatalkan
-                    </Text>) : (data.order_status_id > 1 && data.order_status_id < 4) ? (
-                        <Text style={tw`absolute top-20 left-10 text-green-600`}>
-                            Status pesanan: {data.order_status.name}
+
+                <View
+                    style={tw`absolute bottom-0 flex-row w-full justify-between`}
+                >
+                    <TouchableOpacity style={tw`w-1/2 bg-red-600 py-2 px-3 flex justify-center`} onPress={() => modalCancel.current.toggle()}>
+                        <Text style={tw`text-white font-bold text-center`}>
+                            Batalkan pesanan
                         </Text>
-                    ) : (
-                        <>
-                            <Text style={tw`absolute top-30 left-10 text-green-600`}>
-                                Status pesanan: {data.confirmed ? data.order_status.name : 'Belum dikonfirmasi'}
-                            </Text>
-                            {(data.order_status_id == 5 || !data.confirmed) ? null : (
-                                <>
-                                    <TouchableOpacity style={tw`absolute top-20 right-10`} onPress={() => {
-                                        if (data.order_status_id == 1) {
-                                            modalPay.current.toggle()
-                                        } else {
-                                            modalFinish.current.toggle()
-                                        }
-                                    }
-                                    }>
-                                        <Text style={tw`text-green-400`}>
-                                            {data.order_status_id == 1 ? 'Bayar sekarang' : 'Pesanan Diterima'}
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={tw`absolute top-20 left-10`} onPress={() => modalCancel.current.toggle()}>
-                                        <Text style={tw`text-red-400`}>
-                                            Batalkan pesanan
-                                        </Text>
-                                    </TouchableOpacity>
-                                </>
-                            )}
-                        </>
-                    )}
+                    </TouchableOpacity>
+                    <TouchableOpacity style={tw`w-1/2 bg-purple-600 py-2 px-3 flex justify-center`} onPress={() => modalChangeStatus.current.toggle()}>
+                        <Text style={tw`text-white font-bold text-center`}>
+                            Ubah Status Menjadi {text}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </>
         </View>
     );
